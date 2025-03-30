@@ -1,0 +1,591 @@
+{% extends 'base.html' %}
+
+{% block title %}Comparison Results{% endblock %}
+
+{% block styles %}
+<style>
+    .comparison-container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        gap: 20px;
+    }
+    .comparison-item {
+        flex: 1;
+        text-align: center;
+        overflow: hidden;
+        position: relative;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding-bottom: 10px;
+        background-color: white;
+    }
+    .comparison-item-inner {
+        overflow: auto;
+        max-height: 600px;
+        padding: 10px;
+        position: relative;
+    }
+    .comparison-item img {
+        max-width: 100%;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        transition: transform 0.3s ease;
+        transform-origin: top left;
+    }
+    .original-item {
+        border-top: 5px solid #cc0000;
+    }
+    .original-item h5 {
+        color: #cc0000;
+    }
+    .modified-item {
+        border-top: 5px solid #006600;
+    }
+    .modified-item h5 {
+        color: #006600;
+    }
+    .removed-word {
+        background-color: #ffcccc;
+        color: #cc0000;
+        padding: 2px;
+        border-radius: 3px;
+        text-decoration: line-through;
+    }
+    .added-word {
+        background-color: #ccffcc;
+        color: #006600;
+        padding: 2px;
+        border-radius: 3px;
+    }
+    .unchanged-word {
+        color: #333;
+    }
+    .word-diff-container {
+        background-color: white;
+        padding: 1.5rem;
+        border-radius: 5px;
+        line-height: 1.8;
+        margin-bottom: 2rem;
+    }
+    .legend {
+        padding: 10px;
+        margin-bottom: 20px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        border: 1px solid #dee2e6;
+    }
+    .legend-item {
+        display: inline-block;
+        margin-right: 20px;
+    }
+    .color-box {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        margin-right: 5px;
+        vertical-align: middle;
+    }
+    .red-box {
+        background-color: rgba(255, 0, 0, 0.3);
+    }
+    .green-box {
+        background-color: rgba(0, 255, 0, 0.3);
+    }
+    .page-controls {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+        gap: 10px;
+    }
+    .section-title {
+        margin-top: 30px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #dee2e6;
+    }
+    .zoom-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 8px;
+        background-color: rgba(240, 244, 255, 0.9);
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+    .zoom-controls .btn {
+        padding: 3px 8px;
+        font-size: 14px;
+    }
+    .zoom-input {
+        width: 60px;
+        text-align: center;
+        font-weight: bold;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 3px 5px;
+    }
+    .comparison-legend {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    .comparison-legend-item {
+        display: flex;
+        align-items: center;
+        margin: 0 15px;
+    }
+    .comparison-legend-color {
+        width: 20px;
+        height: 20px;
+        margin-right: 8px;
+        border-radius: 3px;
+    }
+    .comparison-legend-deletion {
+        background-color: #ff6666;
+    }
+    .comparison-legend-addition {
+        background-color: #66cc66;
+    }
+    .comparison-tab-container {
+        margin-bottom: 30px;
+    }
+    .comparison-tab-buttons {
+        display: flex;
+        border-bottom: 1px solid #dee2e6;
+        margin-bottom: 20px;
+    }
+    .comparison-tab-button {
+        padding: 10px 20px;
+        background: none;
+        border: none;
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+        font-weight: 500;
+        color: #495057;
+    }
+    .comparison-tab-button.active {
+        border-bottom-color: #007bff;
+        color: #007bff;
+    }
+    .comparison-tab {
+        display: none;
+    }
+    .comparison-tab.active {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">PDF Comparison Results</h1>
+    
+    <!-- AI Analysis Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">AI Analysis of Differences</h3>
+        </div>
+        <div class="card-body">
+            <div class="ai-analysis">
+                {{ llm_analysis|safe }}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Comparison Tabs Section -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Document Comparison</h3>
+            <div class="comparison-type-toggle">
+                <div class="comparison-tab-buttons">
+                    {% if show_text_comparison %}
+                    <button class="comparison-tab-button active" data-target="text-comparison">Text Comparison</button>
+                    <button class="comparison-tab-button" data-target="visual-comparison">Visual Comparison</button>
+                    {% else %}
+                    <button class="comparison-tab-button" data-target="text-comparison">Text Comparison</button>
+                    <button class="comparison-tab-button active" data-target="visual-comparison">Visual Comparison</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Text Comparison Tab -->
+            <div class="comparison-tab {% if show_text_comparison %}active{% endif %}" id="text-comparison">
+                <div class="comparison-legend">
+                    <div class="comparison-legend-item">
+                        <div class="comparison-legend-color comparison-legend-deletion"></div>
+                        <span>Deleted Content</span>
+                    </div>
+                    <div class="comparison-legend-item">
+                        <div class="comparison-legend-color comparison-legend-addition"></div>
+                        <span>Added Content</span>
+                    </div>
+                </div>
+                
+                <!-- Page Navigation for Text Comparison -->
+                <div class="page-controls mb-3">
+                    <button id="prev-text-page" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Previous</button>
+                    <span id="text-page-indicator" class="mx-2">Page 1 of {{ text_page_count }}</span>
+                    <button id="next-text-page" class="btn btn-sm btn-outline-secondary">Next <i class="bi bi-arrow-right"></i></button>
+                </div>
+                
+                <!-- Text Comparison Container with Paging -->
+                <div id="text-comparison-container">
+                    <div class="word-diff-container">
+                        {{ word_diffs[0]|safe }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Visual Comparison Tab -->
+            <div class="comparison-tab {% if not show_text_comparison %}active{% endif %}" id="visual-comparison">
+                <div class="comparison-legend">
+                    <div class="comparison-legend-item">
+                        <div class="comparison-legend-color comparison-legend-deletion"></div>
+                        <span>Content Removed from Original (Shown in RED on Original)</span>
+                    </div>
+                    <div class="comparison-legend-item">
+                        <div class="comparison-legend-color comparison-legend-addition"></div>
+                        <span>Content Added in Modified (Shown in GREEN on Modified)</span>
+                    </div>
+                </div>
+                
+                <!-- Page Navigation -->
+                <div class="page-controls mb-3">
+                    <button id="prev-page" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Previous</button>
+                    <span id="page-indicator" class="mx-2">Page 1 of {{ page_count }}</span>
+                    <button id="next-page" class="btn btn-sm btn-outline-secondary">Next <i class="bi bi-arrow-right"></i></button>
+                </div>
+                
+                <!-- Comparison Container -->
+                <div id="comparison-container">
+                    <!-- Pages will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center mb-5">
+        <a href="/" class="btn btn-primary">Compare New Files</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab navigation logic
+        const tabButtons = document.querySelectorAll('.comparison-tab-button');
+        const tabs = document.querySelectorAll('.comparison-tab');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-target');
+                
+                // Deactivate all buttons and tabs
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabs.forEach(tab => tab.classList.remove('active'));
+                
+                // Activate the clicked button and corresponding tab
+                this.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+    
+        // Original and modified page images
+        const originalPages = [
+            {% for img in original_pages %}
+                "data:image/jpeg;base64,{{ img }}"{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        const modifiedPages = [
+            {% for img in modified_pages %}
+                "data:image/jpeg;base64,{{ img }}"{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        // Original and modified highlighted images
+        const originalHighlighted = [
+            {% for img in original_highlighted %}
+                "data:image/jpeg;base64,{{ img }}"{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        const modifiedHighlighted = [
+            {% for img in modified_highlighted %}
+                "data:image/jpeg;base64,{{ img }}"{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        // Combined difference images
+        const diffImages = [
+            {% for img in diff_images %}
+                "data:image/jpeg;base64,{{ img }}"{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        let currentPage = 0;
+        const pageCount = {{ page_count }};
+        const pageIndicator = document.getElementById('page-indicator');
+        const prevPageBtn = document.getElementById('prev-page');
+        const nextPageBtn = document.getElementById('next-page');
+        const comparisonContainer = document.getElementById('comparison-container');
+        
+        // Text comparison paging variables
+        const textPageCount = {{ text_page_count|default(1) }};
+        const textPageIndicator = document.getElementById('text-page-indicator');
+        const prevTextPageBtn = document.getElementById('prev-text-page');
+        const nextTextPageBtn = document.getElementById('next-text-page');
+        const textComparisonContainer = document.getElementById('text-comparison-container');
+        let currentTextPage = 0;
+        
+        // Arrays of text comparisons for each page
+        const wordDiffs = [
+            {% for diff in word_diffs %}
+                `{{ diff|safe|replace('\\', '\\\\')|replace('`', '\\`')|replace("'", "\\'") }}`{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        // Update page controls
+        function updatePageControls() {
+            pageIndicator.textContent = `Page ${currentPage + 1} of ${pageCount}`;
+            prevPageBtn.disabled = currentPage === 0;
+            nextPageBtn.disabled = currentPage === pageCount - 1;
+        }
+        
+        // Show current page comparison
+        function showCurrentPageComparison() {
+            // Clear comparison container
+            comparisonContainer.innerHTML = '';
+            
+            // Create comparison container for the current page
+            const pageComparison = document.createElement('div');
+            pageComparison.className = 'comparison-container';
+            
+            // Create original item
+            const originalItem = document.createElement('div');
+            originalItem.className = 'comparison-item original-item';
+            originalItem.innerHTML = `
+                <h5 class="mt-2">Original Document</h5>
+                <div class="comparison-item-inner">
+                    <div class="zoom-controls">
+                        <button class="btn btn-sm btn-outline-secondary zoom-out">-</button>
+                        <input type="text" class="zoom-input" value="100%" readonly>
+                        <button class="btn btn-sm btn-outline-secondary zoom-in">+</button>
+                        <button class="btn btn-sm btn-outline-secondary zoom-reset">Reset</button>
+                    </div>
+                    <img src="${originalHighlighted[currentPage]}" class="comparison-image" alt="Original document with deletions highlighted">
+                </div>
+                <div class="btn-group btn-group-sm mt-2">
+                    <button class="btn btn-outline-secondary toggle-highlights active">Show Highlights</button>
+                    <button class="btn btn-outline-secondary toggle-original">Show Original</button>
+                </div>
+            `;
+            
+            // Create modified item
+            const modifiedItem = document.createElement('div');
+            modifiedItem.className = 'comparison-item modified-item';
+            modifiedItem.innerHTML = `
+                <h5 class="mt-2">Modified Document</h5>
+                <div class="comparison-item-inner">
+                    <div class="zoom-controls">
+                        <button class="btn btn-sm btn-outline-secondary zoom-out">-</button>
+                        <input type="text" class="zoom-input" value="100%" readonly>
+                        <button class="btn btn-sm btn-outline-secondary zoom-in">+</button>
+                        <button class="btn btn-sm btn-outline-secondary zoom-reset">Reset</button>
+                    </div>
+                    <img src="${modifiedHighlighted[currentPage]}" class="comparison-image" alt="Modified document with additions highlighted">
+                </div>
+                <div class="btn-group btn-group-sm mt-2">
+                    <button class="btn btn-outline-secondary toggle-highlights active">Show Highlights</button>
+                    <button class="btn btn-outline-secondary toggle-original">Show Original</button>
+                </div>
+            `;
+            
+            // Add original and modified items to comparison container
+            pageComparison.appendChild(originalItem);
+            pageComparison.appendChild(modifiedItem);
+            
+            // Add comparison container to main container
+            comparisonContainer.appendChild(pageComparison);
+            
+            // Setup zoom controls
+            setupZoomControls();
+            
+            // Setup toggle buttons
+            setupToggleButtons();
+        }
+        
+        // Setup zoom controls
+        function setupZoomControls() {
+            const zoomControls = document.querySelectorAll('.zoom-controls');
+            zoomControls.forEach(control => {
+                const zoomInBtn = control.querySelector('.zoom-in');
+                const zoomOutBtn = control.querySelector('.zoom-out');
+                const zoomResetBtn = control.querySelector('.zoom-reset');
+                const zoomInput = control.querySelector('.zoom-input');
+                const image = control.parentElement.querySelector('img');
+                
+                let zoomLevel = 100;
+                
+                zoomInBtn.addEventListener('click', () => {
+                    zoomLevel += 10;
+                    if (zoomLevel > 200) zoomLevel = 200;
+                    applyZoom(image, zoomInput, zoomLevel);
+                });
+                
+                zoomOutBtn.addEventListener('click', () => {
+                    zoomLevel -= 10;
+                    if (zoomLevel < 50) zoomLevel = 50;
+                    applyZoom(image, zoomInput, zoomLevel);
+                });
+                
+                zoomResetBtn.addEventListener('click', () => {
+                    zoomLevel = 100;
+                    applyZoom(image, zoomInput, zoomLevel);
+                });
+            });
+        }
+        
+        // Apply zoom level to image
+        function applyZoom(image, input, level) {
+            image.style.transform = `scale(${level / 100})`;
+            input.value = `${level}%`;
+        }
+        
+        // Setup toggle buttons
+        function setupToggleButtons() {
+            // Toggle between highlighted and original images
+            const originalToggleButtons = document.querySelectorAll('.original-item .toggle-original');
+            const originalHighlightButtons = document.querySelectorAll('.original-item .toggle-highlights');
+            
+            originalToggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const container = this.closest('.comparison-item');
+                    const image = container.querySelector('img');
+                    image.src = originalPages[currentPage];
+                    
+                    // Update active state
+                    this.classList.add('active');
+                    container.querySelector('.toggle-highlights').classList.remove('active');
+                });
+            });
+            
+            originalHighlightButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const container = this.closest('.comparison-item');
+                    const image = container.querySelector('img');
+                    image.src = originalHighlighted[currentPage];
+                    
+                    // Update active state
+                    this.classList.add('active');
+                    container.querySelector('.toggle-original').classList.remove('active');
+                });
+            });
+            
+            const modifiedToggleButtons = document.querySelectorAll('.modified-item .toggle-original');
+            const modifiedHighlightButtons = document.querySelectorAll('.modified-item .toggle-highlights');
+            
+            modifiedToggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const container = this.closest('.comparison-item');
+                    const image = container.querySelector('img');
+                    image.src = modifiedPages[currentPage];
+                    
+                    // Update active state
+                    this.classList.add('active');
+                    container.querySelector('.toggle-highlights').classList.remove('active');
+                });
+            });
+            
+            modifiedHighlightButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const container = this.closest('.comparison-item');
+                    const image = container.querySelector('img');
+                    image.src = modifiedHighlighted[currentPage];
+                    
+                    // Update active state
+                    this.classList.add('active');
+                    container.querySelector('.toggle-original').classList.remove('active');
+                });
+            });
+        }
+        
+        // Page navigation
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 0) {
+                currentPage--;
+                updatePageControls();
+                showCurrentPageComparison();
+            }
+        });
+        
+        nextPageBtn.addEventListener('click', () => {
+            if (currentPage < pageCount - 1) {
+                currentPage++;
+                updatePageControls();
+                showCurrentPageComparison();
+            }
+        });
+        
+        // Update text page controls
+        function updateTextPageControls() {
+            textPageIndicator.textContent = `Page ${currentTextPage + 1} of ${textPageCount}`;
+            prevTextPageBtn.disabled = currentTextPage === 0;
+            nextTextPageBtn.disabled = currentTextPage === textPageCount - 1;
+        }
+        
+        // Show current text page comparison
+        function showCurrentTextPageComparison() {
+            // Update content
+            textComparisonContainer.innerHTML = `
+                <div class="word-diff-container">
+                    ${wordDiffs[currentTextPage]}
+                </div>
+            `;
+            
+            // Add a note if the message indicates "No significant text differences"
+            if (wordDiffs[currentTextPage].includes("No significant text differences")) {
+                const aiNote = document.createElement('div');
+                aiNote.className = 'alert alert-info mt-3';
+                aiNote.innerHTML = `
+                    <p><strong>AI Assistant:</strong> I've analyzed the text on this page and determined that there are no significant 
+                    differences worth highlighting, or the differences are too minor to be meaningful (such as formatting changes, 
+                    spacing, or repeated trivial words). You may want to check the visual comparison tab for a better view of changes.</p>
+                `;
+                textComparisonContainer.appendChild(aiNote);
+            }
+        }
+        
+        // Text comparison page navigation
+        prevTextPageBtn.addEventListener('click', () => {
+            if (currentTextPage > 0) {
+                currentTextPage--;
+                updateTextPageControls();
+                showCurrentTextPageComparison();
+            }
+        });
+        
+        nextTextPageBtn.addEventListener('click', () => {
+            if (currentTextPage < textPageCount - 1) {
+                currentTextPage++;
+                updateTextPageControls();
+                showCurrentTextPageComparison();
+            }
+        });
+        
+        // Initial setup
+        updatePageControls();
+        showCurrentPageComparison();
+        
+        // Initialize text comparison controls
+        updateTextPageControls();
+        showCurrentTextPageComparison();
+    });
+</script>
+{% endblock %} 
