@@ -52,7 +52,7 @@
         if (currentStep >= steps.length) {
             document.getElementById('status-message').className = 'alert alert-success text-center';
             document.getElementById('status-message').innerText = "All steps completed. Redirecting...";
-            setTimeout(() => window.location.href = "/process", 2000);
+            setTimeout(() => window.location.href = "/processing/done", 2000);  // ✅ Corrected URL
             return;
         }
 

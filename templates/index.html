@@ -1,73 +1,112 @@
 {% extends 'base.html' %}
-{% block title %}PDF Comparison Tool{% endblock %}
+{% block title %}AI-Powered PDF Comparison{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="text-center">PDF Comparison Tool</h2>
-                </div>
-                <div class="card-body">
-                    <p class="text-center mb-4">Upload two PDF files to compare their content and identify differences.</p>
+<div class="text-center mb-5">
+    <h1 class="display-4 fw-bold">Compare PDFs with AI-Powered Insights</h1>
+    <p class="lead text-muted">Upload two PDFs and we’ll highlight visual and textual differences using advanced technology.</p>
+</div>
 
-                    <form action="/upload" method="post" enctype="multipart/form-data">
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="upload-area">
-                                    <i class="bi bi-file-earmark-pdf fs-1 text-primary mb-3"></i>
-                                    <h5>Original PDF</h5>
-                                    <input type="file" name="pdf1" id="pdf1" class="form-control mt-3" accept=".pdf" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="upload-area">
-                                    <i class="bi bi-file-earmark-pdf fs-1 text-primary mb-3"></i>
-                                    <h5>Modified PDF</h5>
-                                    <input type="file" name="pdf2" id="pdf2" class="form-control mt-3" accept=".pdf" required>
-                                </div>
-                            </div>
-                        </div>
+<form action="/upload" method="post" enctype="multipart/form-data" class="mb-5">
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-5">
+            <label class="form-label">Original PDF</label>
+            <input type="file" name="pdf1" class="form-control" required>
+        </div>
+        <div class="col-md-5">
+            <label class="form-label">Modified PDF</label>
+            <input type="file" name="pdf2" class="form-control" required>
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <button type="submit" class="btn btn-primary btn-lg px-4">
+            <i class="bi bi-search me-2"></i> Compare PDFs
+        </button>
+    </div>
+</form>
 
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary btn-lg px-5">
-                                <i class="bi bi-search me-2"></i> Compare PDFs
-                            </button>
-                        </div>
-                    </form>
-                </div>
+<hr class="my-5">
+
+<div class="text-center mb-4" id="features">
+    <h2 class="fw-bold">Powerful Features</h2>
+    <p class="text-muted">Everything you need to compare and understand document differences</p>
+</div>
+<div class="row text-center mb-5">
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <div class="text-primary fs-2 mb-3">📄</div>
+                <h5 class="card-title">Text Comparison</h5>
+                <p class="card-text">Compare and highlight textual differences between PDF documents with word-level accuracy.</p>
             </div>
         </div>
     </div>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <div class="text-success fs-2 mb-3">🖼️</div>
+                <h5 class="card-title">Visual Comparison</h5>
+                <p class="card-text">Detect and visualize changes in diagrams, drawings, and images with precise highlighting.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <div class="text-warning fs-2 mb-3">🤖</div>
+                <h5 class="card-title">AI Insights</h5>
+                <p class="card-text">Get intelligent insights about the differences with AI-powered analysis in a structured format.</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <!-- Feature Boxes -->
-    <div class="row mt-5">
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 text-center feature-card">
-                <div class="card-body">
-                    <i class="bi bi-file-text feature-icon mb-3"></i>
-                    <h4>Text Comparison</h4>
-                    <p>Compare and highlight textual differences between PDF documents with word-level accuracy.</p>
-                </div>
+<hr class="my-5">
+
+<div class="text-center" id="pricing">
+    <h2 class="fw-bold">Pricing Plans</h2>
+    <p class="text-muted">Choose the plan that fits your needs</p>
+</div>
+<div class="row text-center g-4 mt-4">
+    <div class="col-md-4">
+        <div class="card h-100 border-primary">
+            <div class="card-body">
+                <h5 class="card-title">Free</h5>
+                <h6 class="card-subtitle mb-3 text-muted">$0 / month</h6>
+                <ul class="list-unstyled">
+                    <li>✔ 5 comparisons</li>
+                    <li>✔ 5 AI insights</li>
+                    <li>✔ Basic text comparison</li>
+                </ul>
+                <a href="#" class="btn btn-outline-primary mt-3">Start Free</a>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 text-center feature-card">
-                <div class="card-body">
-                    <i class="bi bi-image feature-icon mb-3"></i>
-                    <h4>Visual Comparison</h4>
-                    <p>Detect and visualize changes in diagrams, drawings, and images with precise highlighting.</p>
-                </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5 class="card-title">Pro</h5>
+                <h6 class="card-subtitle mb-3 text-muted">$10 / month</h6>
+                <ul class="list-unstyled">
+                    <li>✔ 50 comparisons</li>
+                    <li>✔ 50 AI insights</li>
+                    <li>✔ Advanced OCR</li>
+                </ul>
+                <a href="#" class="btn btn-success mt-3">Go Pro</a>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 text-center feature-card">
-                <div class="card-body">
-                    <i class="bi bi-robot feature-icon mb-3"></i>
-                    <h4>AI Analysis</h4>
-                    <p>Get intelligent insights about the differences with AI-powered analysis in a structured format.</p>
-                </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-dark">
+            <div class="card-body">
+                <h5 class="card-title">Enterprise</h5>
+                <h6 class="card-subtitle mb-3 text-muted">$29 / month</h6>
+                <ul class="list-unstyled">
+                    <li>✔ Unlimited comparisons</li>
+                    <li>✔ Unlimited AI insights</li>
+                    <li>✔ Dedicated support</li>
+                </ul>
+                <a href="#" class="btn btn-dark mt-3">Contact Us</a>
             </div>
         </div>
     </div>

@@ -6,6 +6,8 @@ import uuid
 import difflib
 import openai
 import re
+from flask import g
+diff_store = {}
 
 app = Flask(__name__)
 app.secret_key = 'pdfusion-secret'
@@ -130,8 +132,10 @@ def upload():
 def processing():
     return render_template('processing.html')
 
-@app.route('/process')
-def process():
+import json
+
+@app.route('/processing/done')
+def processing_done():
     path1 = session.get('file1_path')
     path2 = session.get('file2_path')
 
@@ -156,23 +160,15 @@ def process():
     else:
         diff_text_a, diff_text_b = diff_texts(text1, text2)
 
-    # ✅ Save results in session
-    session['show_visual'] = show_visual
-    session['diff_text_a'] = diff_text_a
-    session['diff_text_b'] = diff_text_b
-
-    # ✅ Redirect to final results page
-    return redirect(url_for('done'))
-
-@app.route('/processing/done')
-def done():
     return render_template(
         "results.html",
-        show_visual=session.get('show_visual', False),
+        show_visual=show_visual,
         diff_ready=True,
-        diff_text_a=session.get('diff_text_a', ''),
-        diff_text_b=session.get('diff_text_b', '')
+        diff_text_a=diff_text_a,
+        diff_text_b=diff_text_b
     )
+
+
 
 @app.route('/image/<filename>')
 def get_image(filename):
