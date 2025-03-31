@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block title %}PDF Comparison Tool{% endblock %}
 
 {% block content %}
@@ -12,33 +11,25 @@
                 </div>
                 <div class="card-body">
                     <p class="text-center mb-4">Upload two PDF files to compare their content and identify differences.</p>
-                    
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ category }}">{{ message }}</div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
-                    
-                    <form action="{{ url_for('upload_files') }}" method="post" enctype="multipart/form-data">
+
+                    <form action="/upload" method="post" enctype="multipart/form-data">
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <div class="upload-area">
                                     <i class="bi bi-file-earmark-pdf fs-1 text-primary mb-3"></i>
                                     <h5>Original PDF</h5>
-                                    <input type="file" name="file1" id="file1" class="form-control mt-3" accept=".pdf">
+                                    <input type="file" name="pdf1" id="pdf1" class="form-control mt-3" accept=".pdf" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="upload-area">
                                     <i class="bi bi-file-earmark-pdf fs-1 text-primary mb-3"></i>
                                     <h5>Modified PDF</h5>
-                                    <input type="file" name="file2" id="file2" class="form-control mt-3" accept=".pdf">
+                                    <input type="file" name="pdf2" id="pdf2" class="form-control mt-3" accept=".pdf" required>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="text-center">
                             <button type="submit" class="btn btn-primary btn-lg px-5">
                                 <i class="bi bi-search me-2"></i> Compare PDFs
@@ -49,7 +40,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Feature Boxes -->
     <div class="row mt-5">
         <div class="col-md-4 mb-4">
@@ -81,4 +72,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}
