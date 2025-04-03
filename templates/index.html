@@ -1,0 +1,389 @@
+{% extends 'base.html' %}
+{% block title %}PDFusion - Compare PDF Files{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h1 class="fw-bold hero-title">PDFusion</h1>
+            <p class="lead">Use AI to Compare PDF Files</p>
+        </div>
+
+        <div class="row justify-content-center" id="get-started">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary py-3">
+                        <h4 class="mb-0 text-white">Upload Files for Comparison</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold" for="pdf1">PDF Document 1</label>
+                                <input type="file" class="form-control" id="pdf1" name="pdf1" accept=".pdf" required>
+                                <div class="form-text text-muted fw-normal">The original document to compare against.</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-bold" for="pdf2">PDF Document 2</label>
+                                <input type="file" class="form-control" id="pdf2" name="pdf2" accept=".pdf" required>
+                                <div class="form-text text-muted fw-normal">The modified document to compare with the original.</div>
+                            </div>
+                            
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg px-4">
+                                    <i class="bi bi-search me-2"></i>Compare Files
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Unified How It Works & Features Section -->
+        <div class="row mt-5 pt-5" id="how-it-works">
+            <div class="col-12">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold">How It Works</h2>
+                    <p class="text-muted mx-auto" style="max-width: 700px;">Our powerful features guide you through an effortless document comparison experience</p>
+                </div>
+                
+                <!-- Feature steps with numbers and icons -->
+                <div class="workflow-container">
+                    <div class="workflow-steps">
+                        <div class="workflow-step user-step">
+                            <div class="step-icon">
+                                <div class="icon-content">📤</div>
+                            </div>
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h5>Upload</h5>
+                                <p>Upload your documents</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step backend-step">
+                            <div class="step-icon">
+                                <div class="icon-content">🖼️</div>
+                            </div>
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h5>Extract Images</h5>
+                                <p>Images are extracted</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step backend-step">
+                            <div class="step-icon">
+                                <div class="icon-content">📝</div>
+                            </div>
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h5>Extract Text</h5>
+                                <p>Text is processed</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step backend-step">
+                            <div class="step-icon">
+                                <div class="icon-content">🤖</div>
+                            </div>
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h5>AI Analysis</h5>
+                                <p>AI analyzes differences</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step user-step">
+                            <div class="step-icon">
+                                <div class="icon-content">🔍</div>
+                            </div>
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h5>Visual Results</h5>
+                                <p>See highlighted changes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="row mt-5 pt-5" id="pricing">
+            <div class="col-12">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold">Pricing Plans</h2>
+                    <p class="text-muted mx-auto" style="max-width: 600px;">Choose the plan that fits your needs</p>
+                </div>
+                <div class="row g-4 justify-content-center">
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body p-4">
+                                <h5 class="card-title text-center mb-3">Free</h5>
+                                <div class="text-center mb-4">
+                                    <span class="display-5 fw-bold">$0</span>
+                                    <span class="text-muted">CAD</span>
+                                </div>
+                                <ul class="list-unstyled mb-4">
+                                    <li class="mb-2">✅ 5 comparisons</li>
+                                    <li class="mb-2">✅ 5 AI-powered insights</li>
+                                    <li class="mb-2 text-muted">❌ Priority support</li>
+                                </ul>
+                                <div class="text-center mt-auto">
+                                    <a href="#" class="btn btn-outline-primary w-100">Start Free</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-primary position-relative">
+                            <div class="position-absolute top-0 start-50 translate-middle badge bg-primary px-3 py-2 rounded-pill">
+                                Popular
+                            </div>
+                            <div class="card-body p-4">
+                                <h5 class="card-title text-center mb-3">Pro</h5>
+                                <div class="text-center mb-4">
+                                    <span class="display-5 fw-bold">$10</span>
+                                    <span class="text-muted">CAD/month</span>
+                                </div>
+                                <ul class="list-unstyled mb-4">
+                                    <li class="mb-2">✅ 50 comparisons</li>
+                                    <li class="mb-2">✅ 50 AI-powered insights</li>
+                                    <li class="mb-2">✅ Priority support</li>
+                                </ul>
+                                <div class="text-center mt-auto">
+                                    <a href="#" class="btn btn-primary w-100">Go Pro</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body p-4">
+                                <h5 class="card-title text-center mb-3">Enterprise</h5>
+                                <div class="text-center mb-4">
+                                    <span class="display-5 fw-bold">$29</span>
+                                    <span class="text-muted">CAD/month</span>
+                                </div>
+                                <ul class="list-unstyled mb-4">
+                                    <li class="mb-2">✅ Unlimited comparisons</li>
+                                    <li class="mb-2">✅ Unlimited AI-powered insights</li>
+                                    <li class="mb-2">✅ Priority support</li>
+                                </ul>
+                                <div class="text-center mt-auto">
+                                    <a href="#" class="btn btn-outline-primary w-100">Contact Us</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hero-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+        font-size: 3.5rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+    }
+    
+    /* Form help text styles - explicitly dark in light mode, white in dark mode */
+    .form-help-text {
+        color: #000000 !important;
+        font-weight: 600;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+        .form-help-text {
+            color: #ffffff !important;
+        }
+    }
+    
+    /* Modern workflow style */
+    .workflow-container {
+        margin: 2rem 0 3rem;
+        overflow-x: auto; /* Allow horizontal scroll on small screens */
+    }
+    
+    .workflow-steps {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        min-width: 100%;
+        padding: 0.5rem;
+    }
+    
+    .workflow-step {
+        flex: 1;
+        min-width: 120px;
+        position: relative;
+        padding: 1rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        z-index: 1;
+        margin: 0 5px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Remove margin between steps */
+    .workflow-step:not(:last-child) {
+        margin-right: 0;
+    }
+    
+    /* Step icons */
+    .step-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        z-index: 2;
+    }
+    
+    .icon-content {
+        position: relative;
+        z-index: 2;
+        font-size: 2rem;
+    }
+    
+    .user-step .step-icon {
+        background-color: rgba(3, 78, 145, 0.1);
+        border-color: var(--primary);
+    }
+    
+    .backend-step .step-icon {
+        background-color: rgba(128, 128, 128, 0.08);
+        border-color: var(--secondary);
+    }
+    
+    /* Step numbers */
+    .step-number {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 3;
+    }
+    
+    .backend-step .step-number {
+        background-color: var(--secondary);
+    }
+    
+    /* Step content */
+    .step-content {
+        padding: 0.5rem 0;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .step-content h5 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+    }
+    
+    .step-content p {
+        font-size: 0.9rem;
+        color: var(--text-muted, #6c757d);
+        margin-bottom: 0;
+    }
+    
+    /* Hover effects */
+    .workflow-step:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .user-step:hover {
+        background-color: rgba(13, 110, 253, 0.15);
+        border-color: var(--primary);
+    }
+    
+    .backend-step:hover {
+        background-color: rgba(40, 167, 69, 0.15);
+        border-color: var(--success, #28a745);
+    }
+    
+    .workflow-step:hover .step-icon {
+        transform: scale(1.05);
+    }
+    
+    :root {
+        --text-color: #212529;
+        --text-muted: #6c757d;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+        .form-help-text {
+            color: #ffffff !important;
+        }
+        
+        :root {
+            --text-color: #f8f9fa;
+            --text-muted: #adb5bd;
+        }
+        
+        .user-step {
+            background-color: rgba(13, 110, 253, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .backend-step {
+            background-color: rgba(173, 181, 189, 0.05);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .user-step .step-icon {
+            background-color: rgba(13, 110, 253, 0.15);
+        }
+        
+        .backend-step .step-icon {
+            background-color: rgba(173, 181, 189, 0.1);
+        }
+        
+        .user-step:hover {
+            background-color: rgba(13, 110, 253, 0.1);
+            border-color: rgba(13, 110, 253, 0.3);
+        }
+        
+        .backend-step:hover {
+            background-color: rgba(173, 181, 189, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+    }
+    
+    /* Ensure responsive behavior */
+    @media (max-width: 768px) {
+        .workflow-steps {
+            justify-content: flex-start;
+            min-width: 700px; /* Ensure steps don't squish too much */
+        }
+        
+        .workflow-container {
+            padding-bottom: 1rem;
+        }
+    }
+</style>
+
+{% endblock %}
