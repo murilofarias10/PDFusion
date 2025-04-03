@@ -670,12 +670,14 @@ input[type="number"] {
 
 /* Make 'Popular' tag more visible */
 .badge.bg-primary.px-3.py-2 {
-    font-size: 0.9rem;
+    font-size: 1rem;
     padding: 0.35rem 0.75rem !important;
     margin-top: -0.75rem !important;
     font-weight: 600;
     letter-spacing: 0.5px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white !important;
+    z-index: 10;
 }
 
 /* Fix card header text color in white theme */
@@ -718,15 +720,122 @@ input[type="number"] {
     color: white !important;
 }
 
-/* Make Popular tag more prominent */
+/* Top Popular banner styling */
+.card-popular-top {
+    background-color: var(--primary);
+    color: white;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 8px 0;
+    text-align: center;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) inset;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.dark .card-popular-top {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) inset;
+}
+
+/* Popular circular badge styling */
+.popular-badge {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    background-color: var(--primary);
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 15px 10px;
+    text-align: center;
+    border-radius: 50%;
+    z-index: 10;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    width: 75px;
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.dark .popular-badge {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    border-color: var(--background-alt);
+}
+
+/* Popular corner ribbon styling */
+.popular-ribbon-corner {
+    position: absolute;
+    top: 20px;
+    right: -45px;
+    width: 170px;
+    background-color: var(--primary);
+    color: white;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 6px 0;
+    text-align: center;
+    transform: rotate(45deg);
+    transform-origin: center;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.dark .popular-ribbon-corner {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* Original Popular ribbon styling */
+.popular-ribbon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: var(--primary);
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 10;
+    border-bottom-left-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    transform-origin: top right;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.dark .popular-ribbon {
+    background-color: var(--primary);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Remove old badge styles since we're using the ribbon now */
 .badge.bg-primary.px-3.py-2.rounded-pill {
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 1.1rem;
+    font-weight: 700;
     padding: 0.5rem 1rem !important;
     margin-top: -1rem !important;
     letter-spacing: 0.5px;
-    box-shadow: 0 6px 12px rgba(3, 78, 145, 0.15);
-    z-index: 5;
+    box-shadow: 0 6px 12px rgba(3, 78, 145, 0.25);
+    z-index: 10;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark .badge.bg-primary.px-3.py-2.rounded-pill {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* Sponsor section styling */

@@ -15,7 +15,9 @@ import threading
 from datetime import datetime, timedelta
 diff_store = {}
 
-app = Flask(__name__)
+app = Flask(__name__, 
+            template_folder='.',
+            static_folder='static')
 app.secret_key = 'pdfusion-secret'
 UPLOAD_FOLDER = 'uploads'
 OUTPUT_FOLDER = 'output'
