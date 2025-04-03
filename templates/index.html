@@ -1,114 +1,325 @@
 {% extends 'base.html' %}
-{% block title %}AI-Powered PDF Comparison{% endblock %}
+{% block title %}PDFusion - Compare PDF Files{% endblock %}
 
 {% block content %}
-<div class="text-center mb-5">
-    <h1 class="display-4 fw-bold">Compare PDFs with AI-Powered Insights</h1>
-    <p class="lead text-muted">Upload two PDFs and we’ll highlight visual and textual differences using advanced technology.</p>
-</div>
+<section class="py-4">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h1 class="fw-bold hero-title">PDFusion</h1>
+            <p class="lead">Use AI to Compare PDF Files</p>
+        </div>
 
-<form action="/upload" method="post" enctype="multipart/form-data" class="mb-5">
-    <div class="row g-4 justify-content-center">
-        <div class="col-md-5">
-            <label class="form-label">Original PDF</label>
-            <input type="file" name="pdf1" class="form-control" required>
+        <div class="row justify-content-center" id="get-started">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary py-3">
+                        <h4 class="mb-0 text-white">Upload Files for Comparison</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold" for="pdf1">PDF Document 1</label>
+                                <input type="file" class="form-control" id="pdf1" name="pdf1" accept=".pdf" required>
+                                <div class="form-text">The original document to compare against.</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-bold" for="pdf2">PDF Document 2</label>
+                                <input type="file" class="form-control" id="pdf2" name="pdf2" accept=".pdf" required>
+                                <div class="form-text">The modified document to compare with the original.</div>
+                            </div>
+                            
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg px-4">
+                                    <i class="bi bi-search me-2"></i>Compare Files
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-5">
-            <label class="form-label">Modified PDF</label>
-            <input type="file" name="pdf2" class="form-control" required>
+        
+        <!-- Unified How It Works & Features Section -->
+        <div class="row mt-5 pt-5" id="how-it-works">
+            <div class="col-12">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold">How It Works</h2>
+                    <p class="text-muted mx-auto" style="max-width: 700px;">Our powerful features guide you through an effortless document comparison experience</p>
+                </div>
+                
+                <!-- Feature steps with numbers and icons -->
+                <div class="steps-container position-relative">
+                    <div class="steps-connector"></div>
+                    <div class="row g-4">
+                        <div class="col-md-6 col-lg-3">
+                            <div class="feature-step">
+                                <div class="step-icon-container">
+                                    <div class="step-number">1</div>
+                                    <div class="feature-icon">📄</div>
+                                </div>
+                                <div class="step-content">
+                                    <h5>Upload & Scan</h5>
+                                    <p class="text-muted">Upload your documents and our smart text recognition extracts all content for accurate comparison</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="feature-step">
+                                <div class="step-icon-container">
+                                    <div class="step-number">2</div>
+                                    <div class="feature-icon">🖼️</div>
+                                </div>
+                                <div class="step-content">
+                                    <h5>Extract Images</h5>
+                                    <p class="text-muted">Images from all pages are automatically identified and extracted for side-by-side comparison</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="feature-step">
+                                <div class="step-icon-container">
+                                    <div class="step-number">3</div>
+                                    <div class="feature-icon">🤖</div>
+                                </div>
+                                <div class="step-content">
+                                    <h5>AI Analysis</h5>
+                                    <p class="text-muted">Our AI carefully analyzes differences and provides intelligent insights about the changes</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="feature-step">
+                                <div class="step-icon-container">
+                                    <div class="step-number">4</div>
+                                    <div class="feature-icon">🔍</div>
+                                </div>
+                                <div class="step-content">
+                                    <h5>Visual Results</h5>
+                                    <p class="text-muted">Get detailed visual comparison with color highlighting to easily identify all changes</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="text-center mt-4">
-        <button type="submit" class="btn btn-primary btn-lg px-4">
-            <i class="bi bi-search me-2"></i> Compare PDFs
-        </button>
-    </div>
-</form>
 
-<hr class="my-5">
+        <!-- Pricing Section -->
+        <div class="row mt-5 pt-5" id="pricing">
+            <div class="col-12">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold">Pricing Plans</h2>
+                    <p class="text-muted mx-auto" style="max-width: 600px;">Choose the plan that fits your needs</p>
+                </div>
+                <div class="row g-4 justify-content-center">
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body p-4">
+                                <h5 class="card-title text-center mb-3">Free</h5>
+                                <div class="text-center mb-4">
+                                    <span class="display-5 fw-bold">$0</span>
+                                    <span class="text-muted">CAD</span>
+                                </div>
+                                <ul class="list-unstyled mb-4">
+                                    <li class="mb-2">✅ 5 comparisons</li>
+                                    <li class="mb-2">✅ 5 AI-powered insights</li>
+                                    <li class="mb-2 text-muted">❌ Priority support</li>
+                                </ul>
+                                <div class="text-center mt-auto">
+                                    <a href="#" class="btn btn-outline-primary w-100">Start Free</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-primary position-relative">
+                            <div class="position-absolute top-0 start-50 translate-middle badge bg-primary px-3 py-2 rounded-pill">
+                                Popular
+                            </div>
+                            <div class="card-body p-4">
+                                <h5 class="card-title text-center mb-3">Pro</h5>
+                                <div class="text-center mb-4">
+                                    <span class="display-5 fw-bold">$10</span>
+                                    <span class="text-muted">CAD/month</span>
+                                </div>
+                                <ul class="list-unstyled mb-4">
+                                    <li class="mb-2">✅ 50 comparisons</li>
+                                    <li class="mb-2">✅ 50 AI-powered insights</li>
+                                    <li class="mb-2">✅ Priority support</li>
+                                </ul>
+                                <div class="text-center mt-auto">
+                                    <a href="#" class="btn btn-primary w-100">Go Pro</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body p-4">
+                                <h5 class="card-title text-center mb-3">Enterprise</h5>
+                                <div class="text-center mb-4">
+                                    <span class="display-5 fw-bold">$29</span>
+                                    <span class="text-muted">CAD/month</span>
+                                </div>
+                                <ul class="list-unstyled mb-4">
+                                    <li class="mb-2">✅ Unlimited comparisons</li>
+                                    <li class="mb-2">✅ Unlimited AI-powered insights</li>
+                                    <li class="mb-2">✅ Priority support</li>
+                                </ul>
+                                <div class="text-center mt-auto">
+                                    <a href="#" class="btn btn-outline-primary w-100">Contact Us</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-<div class="text-center mb-4" id="features">
-    <h2 class="fw-bold">Powerful Features</h2>
-    <p class="text-muted">Everything you need to compare and understand document differences</p>
-</div>
-<div class="row text-center mb-5">
-    <div class="col-md-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <div class="text-primary fs-2 mb-3">📄</div>
-                <h5 class="card-title">Text Comparison</h5>
-                <p class="card-text">Compare and highlight textual differences between PDF documents with word-level accuracy.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <div class="text-success fs-2 mb-3">🖼️</div>
-                <h5 class="card-title">Visual Comparison</h5>
-                <p class="card-text">Detect and visualize changes in diagrams, drawings, and images with precise highlighting.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <div class="text-warning fs-2 mb-3">🤖</div>
-                <h5 class="card-title">AI Insights</h5>
-                <p class="card-text">Get intelligent insights about the differences with AI-powered analysis in a structured format.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<hr class="my-5">
-
-<div class="text-center" id="pricing">
-    <h2 class="fw-bold">Pricing Plans</h2>
-    <p class="text-muted">Choose the plan that fits your needs</p>
-</div>
-<div class="row text-center g-4 mt-4">
-    <div class="col-md-4">
-        <div class="card h-100 border-primary">
-            <div class="card-body">
-                <h5 class="card-title">Free</h5>
-                <h6 class="card-subtitle mb-3 text-muted">$0 / month</h6>
-                <ul class="list-unstyled">
-                    <li>✔ 5 comparisons</li>
-                    <li>✔ 5 AI insights</li>
-                    <li>✔ Basic text comparison</li>
-                </ul>
-                <a href="#" class="btn btn-outline-primary mt-3">Start Free</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card h-100 border-success">
-            <div class="card-body">
-                <h5 class="card-title">Pro</h5>
-                <h6 class="card-subtitle mb-3 text-muted">$10 / month</h6>
-                <ul class="list-unstyled">
-                    <li>✔ 50 comparisons</li>
-                    <li>✔ 50 AI insights</li>
-                    <li>✔ Advanced OCR</li>
-                </ul>
-                <a href="#" class="btn btn-success mt-3">Go Pro</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card h-100 border-dark">
-            <div class="card-body">
-                <h5 class="card-title">Enterprise</h5>
-                <h6 class="card-subtitle mb-3 text-muted">$29 / month</h6>
-                <ul class="list-unstyled">
-                    <li>✔ Unlimited comparisons</li>
-                    <li>✔ Unlimited AI insights</li>
-                    <li>✔ Dedicated support</li>
-                </ul>
-                <a href="#" class="btn btn-dark mt-3">Contact Us</a>
-            </div>
-        </div>
-    </div>
-</div>
+<style>
+    .hero-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+        font-size: 3.5rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+    }
+    
+    /* Enhanced feature steps */
+    .steps-container {
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .steps-connector {
+        position: absolute;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        height: 4px;
+        background: linear-gradient(to right, var(--primary), var(--secondary));
+        z-index: 1;
+    }
+    
+    .feature-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1rem;
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-step:hover {
+        transform: translateY(-10px);
+    }
+    
+    .step-icon-container {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    
+    .step-number {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-family: 'Montserrat', sans-serif;
+        box-shadow: 0 4px 8px rgba(3, 78, 145, 0.2);
+        z-index: 3;
+    }
+    
+    .feature-step:nth-child(2) .step-number {
+        background-color: var(--accent-blue);
+    }
+    
+    .feature-step:nth-child(3) .step-number {
+        background-color: var(--secondary);
+    }
+    
+    .feature-step:nth-child(4) .step-number {
+        background-color: var(--accent-green);
+    }
+    
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: rgba(3, 78, 145, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-step:hover .feature-icon {
+        transform: scale(1.1);
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    .feature-step:nth-child(2):hover .feature-icon {
+        background-color: var(--accent-blue);
+    }
+    
+    .feature-step:nth-child(3):hover .feature-icon {
+        background-color: var(--secondary);
+    }
+    
+    .feature-step:nth-child(4):hover .feature-icon {
+        background-color: var(--accent-green);
+    }
+    
+    .step-content {
+        padding: 1rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .step-content h5 {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: var(--primary);
+    }
+    
+    .feature-step:nth-child(2) .step-content h5 {
+        color: var(--accent-blue);
+    }
+    
+    .feature-step:nth-child(3) .step-content h5 {
+        color: var(--secondary);
+    }
+    
+    .feature-step:nth-child(4) .step-content h5 {
+        color: var(--accent-green);
+    }
+    
+    @media (max-width: 992px) {
+        .steps-connector {
+            display: none;
+        }
+        
+        .feature-step {
+            margin-bottom: 2rem;
+        }
+    }
+</style>
 {% endblock %}

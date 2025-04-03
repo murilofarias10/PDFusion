@@ -1,0 +1,20 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="30" fill="#034E91"/>
+  
+  <!-- Stylized document icon - left document -->
+  <path d="M21 15C21 13.8954 21.8954 13 23 13H36C37.1046 13 38 13.8954 38 15V43C38 44.1046 37.1046 45 36 45H23C21.8954 45 21 44.1046 21 43V15Z" fill="white"/>
+  
+  <!-- Right document (overlapping) -->
+  <path d="M26 21C26 19.8954 26.8954 19 28 19H41C42.1046 19 43 19.8954 43 21V49C43 50.1046 42.1046 51 41 51H28C26.8954 51 26 50.1046 26 49V21Z" fill="#4F7F11"/>
+  
+  <!-- Decorative lines on left document -->
+  <rect x="25" y="23" width="8" height="1" rx="0.5" fill="#034E91"/>
+  <rect x="25" y="28" width="8" height="1" rx="0.5" fill="#034E91"/>
+  <rect x="25" y="33" width="8" height="1" rx="0.5" fill="#034E91"/>
+  
+  <!-- Decorative lines on right document -->
+  <rect x="30" y="26" width="8" height="1" rx="0.5" fill="white"/>
+  <rect x="30" y="31" width="8" height="1" rx="0.5" fill="white"/>
+  <rect x="30" y="36" width="8" height="1" rx="0.5" fill="white"/>
+</svg> 

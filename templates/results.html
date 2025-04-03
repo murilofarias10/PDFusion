@@ -1,52 +1,131 @@
 {% extends 'base.html' %}
 {% block title %}Comparison Results{% endblock %}
 {% block content %}
-<h3 class="text-center mb-4">Comparison Results</h3>
+<section class="py-3">
+    <div class="container">
+        <div class="text-center mb-3">
+            <h2 class="fw-bold">Comparison Results</h2>
+        </div>
 
-{% if show_visual %}
-<div class="row mb-4">
-    <div class="col-md-6">
-        <h5 class="text-danger">PDF A - Red Highlights (Deletions)</h5>
-        <div class="border rounded p-2 position-relative" style="overflow:auto; max-height:80vh;">
-            <img id="img1" src="{{ url_for('get_image', filename='pdf_a_highlighted.png') }}"
-                 class="img-fluid" style="transform-origin: top left; transition: transform 0.3s;">
+        <!-- AI Analysis Section - Removed -->
+
+        <!-- Pagination controls for multi-page documents - ALWAYS VISIBLE -->
+        <div class="pagination-controls mb-3">
+            <button class="page-button" id="prev-page" disabled>
+                <i class="bi bi-chevron-left"></i> Previous Page
+            </button>
+            <div class="page-indicator">
+                Page <span id="current-page">1</span> of <span id="total-pages">1</span>
+            </div>
+            <button class="page-button" id="next-page" disabled>
+                Next Page <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Visual Comparison Section - Always visible -->
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-danger bg-opacity-10 text-danger d-flex align-items-center">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        <h5 class="mb-0">PDF A - Red Highlights (Deletions)</h5>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="border rounded p-2 position-relative" style="overflow:auto; height:50vh;">
+                            <img id="img1" src="{{ url_for('get_image', filename='pdf_a_highlighted.png') }}"
+                                class="img-fluid" style="transform-origin: top left; transition: transform 0.3s;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-success bg-opacity-10 text-success d-flex align-items-center">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        <h5 class="mb-0">PDF B - Green Highlights (Additions)</h5>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="border rounded p-2 position-relative" style="overflow:auto; height:50vh;">
+                            <img id="img2" src="{{ url_for('get_image', filename='pdf_b_highlighted.png') }}"
+                                class="img-fluid" style="transform-origin: top left; transition: transform 0.3s;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zoom Controls -->
+        <div class="zoom-controls mb-3">
+            <button class="btn btn-outline-primary" onclick="zoomIn()">
+                <i class="bi bi-zoom-in me-1"></i> Zoom In
+            </button>
+            <button class="btn btn-outline-primary" onclick="zoomOut()">
+                <i class="bi bi-zoom-out me-1"></i> Zoom Out
+            </button>
+            <button class="btn btn-outline-secondary" onclick="resetZoom()">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+            </button>
+            <div class="d-flex align-items-center ms-2">
+                <input type="number" id="zoomInput" value="100" min="25" max="500" step="5"
+                    class="form-control text-center" style="width: 80px;" onchange="setZoom(this.value)">
+                <span class="ms-2">%</span>
+            </div>
+        </div>
+
+        <!-- Text Comparison Section - Always visible -->
+        <div class="row g-3 mb-3" id="text-comparison-container">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-danger bg-opacity-10 text-danger d-flex align-items-center">
+                        <i class="bi bi-file-text me-2"></i>
+                        <h5 class="mb-0">Text from PDF A</h5>
+                    </div>
+                    <div class="card-body p-2">
+                        <div id="text-a-content" class="pdf-text-content bg-light border p-3 rounded" style="white-space: pre-wrap; max-height: 50vh; overflow-y: auto;">
+                            {{ diff_text_a|safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-success bg-opacity-10 text-success d-flex align-items-center">
+                        <i class="bi bi-file-text me-2"></i>
+                        <h5 class="mb-0">Text from PDF B</h5>
+                    </div>
+                    <div class="card-body p-2">
+                        <div id="text-b-content" class="pdf-text-content bg-light border p-3 rounded" style="white-space: pre-wrap; max-height: 50vh; overflow-y: auto;">
+                            {{ diff_text_b|safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center">
+            <a href="/" class="btn btn-primary me-2">
+                <i class="bi bi-arrow-left me-2"></i>Compare New PDFs
+            </a>
+            <button class="btn btn-secondary" onclick="window.print()">
+                <i class="bi bi-printer me-2"></i>Print Results
+            </button>
         </div>
     </div>
-    <div class="col-md-6">
-        <h5 class="text-success">PDF B - Green Highlights (Additions)</h5>
-        <div class="border rounded p-2 position-relative" style="overflow:auto; max-height:80vh;">
-            <img id="img2" src="{{ url_for('get_image', filename='pdf_b_highlighted.png') }}"
-                 class="img-fluid" style="transform-origin: top left; transition: transform 0.3s;">
-        </div>
-    </div>
-</div>
+</section>
 
-<!-- Zoom Controls -->
-<div class="text-center mt-3 mb-5">
-    <button class="btn btn-outline-primary me-2" onclick="zoomIn()">Zoom In</button>
-    <button class="btn btn-outline-primary me-2" onclick="zoomOut()">Zoom Out</button>
-    <button class="btn btn-outline-secondary me-2" onclick="resetZoom()">Reset</button>
-    <input type="number" id="zoomInput" value="100" min="25" max="500" step="5"
-           class="form-control d-inline-block text-center" style="width: 80px;" onchange="setZoom(this.value)"> %
-</div>
-{% endif %}
-
-{% if diff_ready and not show_visual %}
-<div class="row">
-    <div class="col-md-6">
-        <h5>Text from PDF A</h5>
-        <div class="border p-3" style="white-space: pre-wrap;">{{ diff_text_a|safe }}</div>
-    </div>
-    <div class="col-md-6">
-        <h5>Text from PDF B</h5>
-        <div class="border p-3" style="white-space: pre-wrap;">{{ diff_text_b|safe }}</div>
-    </div>
-</div>
-{% endif %}
-
-<div class="text-center mt-5">
-    <a href="/" class="btn btn-secondary"><i class="bi bi-arrow-left me-2"></i>Compare New PDFs</a>
-</div>
+<!-- Set template variables for JS -->
+<script>
+    // Pass backend data to JavaScript
+    var totalPagesFromServer = {% if total_pages is defined %}{{ total_pages }}{% else %}1{% endif %};
+    var currentPage = 1;
+    var isVisualComparison = true; // Always show visual comparison
+    
+    // Add cleanup on page unload
+    window.addEventListener('beforeunload', function() {
+        // Send cleanup request to server
+        navigator.sendBeacon('/cleanup');
+    });
+</script>
 
 <script>
     let zoom = 1;
@@ -83,5 +162,172 @@
             applyZoom();
         }
     }
+    
+    // Document ready event
+    document.addEventListener('DOMContentLoaded', function() {
+        // PDF Pagination setup
+        setupPagination();
+    });
+
+    // Pagination functionality
+    function setupPagination() {
+        // Get pagination elements
+        const prevButton = document.getElementById('prev-page');
+        const nextButton = document.getElementById('next-page');
+        const currentPageSpan = document.getElementById('current-page');
+        const totalPagesSpan = document.getElementById('total-pages');
+        
+        // Set initial values
+        let totalPages = totalPagesFromServer || 1;
+        
+        // Update pagination display
+        totalPagesSpan.textContent = totalPages;
+        
+        // Only show pagination if we have more than 1 page
+        if (totalPages <= 1) {
+            document.querySelector('.pagination-controls').style.display = 'none';
+        } else {
+            document.querySelector('.pagination-controls').style.display = 'flex';
+        }
+        
+        // Update pagination UI
+        function updatePagination() {
+            currentPageSpan.textContent = currentPage;
+            prevButton.disabled = currentPage <= 1;
+            nextButton.disabled = currentPage >= totalPages;
+            
+            // Update the displayed page content
+            updateDisplayedContent(currentPage);
+        }
+        
+        // Function to update the displayed content based on page number
+        function updateDisplayedContent(pageNum) {
+            // Visual comparison - load new images
+            fetch(`/get_page/${pageNum}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update the images with new content
+                        document.getElementById('img1').src = data.img1_url;
+                        document.getElementById('img2').src = data.img2_url;
+                    }
+                })
+                .catch(error => console.error('Error loading page:', error));
+
+            // Text comparison - load new text content
+            fetch(`/get_text_page/${pageNum}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update the text content divs
+                        document.getElementById('text-a-content').innerHTML = data.text_a;
+                        document.getElementById('text-b-content').innerHTML = data.text_b;
+                    }
+                })
+                .catch(error => console.error('Error loading text page:', error));
+        }
+        
+        // Event listeners for pagination buttons
+        prevButton.addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePagination();
+            }
+        });
+        
+        nextButton.addEventListener('click', function() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                updatePagination();
+            }
+        });
+        
+        // Initialize
+        updatePagination();
+    }
 </script>
+
+<style>
+    /* Dark mode fixes */
+    .bg-light {
+        background-color: var(--bs-light) !important;
+    }
+    
+    .text-muted {
+        color: var(--bs-gray-600) !important;
+    }
+    
+    .card {
+        background-color: var(--bs-body-bg);
+    }
+    
+    .card-header {
+        background-color: var(--bs-body-bg) !important;
+    }
+    
+    /* Compact spacing */
+    .card-body {
+        padding: 0.5rem;
+    }
+    
+    .mb-5, .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+    
+    .py-5 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+    
+    /* Ensure pagination controls are always visible */
+    .pagination-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    
+    /* Update danger/success colors to match our brand guidelines */
+    .bg-danger.bg-opacity-10 {
+        background-color: rgba(239, 68, 68, 0.15) !important;
+    }
+    
+    .text-danger {
+        color: #b91c1c !important;
+    }
+    
+    .bg-success.bg-opacity-10 {
+        background-color: rgba(79, 127, 17, 0.15) !important;
+    }
+    
+    .text-success {
+        color: #4F7F11 !important;
+    }
+    
+    /* Image grid styling */
+    .image-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .image-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .image-caption {
+        font-size: 0.8rem;
+        text-align: center;
+        margin-top: 4px;
+    }
+    
+    .img-thumbnail {
+        max-height: 120px;
+        object-fit: contain;
+    }
+</style>
 {% endblock %}
