@@ -20,13 +20,13 @@
                             <div class="mb-4">
                                 <label class="form-label fw-bold" for="pdf1">PDF Document 1</label>
                                 <input type="file" class="form-control" id="pdf1" name="pdf1" accept=".pdf" required>
-                                <div class="form-text">The original document to compare against.</div>
+                                <div class="form-text text-muted fw-normal">The original document to compare against.</div>
                             </div>
                             
                             <div class="mb-4">
                                 <label class="form-label fw-bold" for="pdf2">PDF Document 2</label>
                                 <input type="file" class="form-control" id="pdf2" name="pdf2" accept=".pdf" required>
-                                <div class="form-text">The modified document to compare with the original.</div>
+                                <div class="form-text text-muted fw-normal">The modified document to compare with the original.</div>
                             </div>
                             
                             <div class="text-center mt-4">
@@ -49,55 +49,56 @@
                 </div>
                 
                 <!-- Feature steps with numbers and icons -->
-                <div class="steps-container position-relative">
-                    <div class="steps-connector"></div>
-                    <div class="row g-4">
-                        <div class="col-md-6 col-lg-3">
-                            <div class="feature-step">
-                                <div class="step-icon-container">
-                                    <div class="step-number">1</div>
-                                    <div class="feature-icon">📄</div>
-                                </div>
-                                <div class="step-content">
-                                    <h5>Upload & Scan</h5>
-                                    <p class="text-muted">Upload your documents and our smart text recognition extracts all content for accurate comparison</p>
-                                </div>
+                <div class="workflow-container">
+                    <div class="workflow-steps">
+                        <div class="workflow-step user-step">
+                            <div class="step-icon">
+                                <div class="icon-content">📤</div>
+                            </div>
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h5>Upload</h5>
+                                <p>Upload your documents</p>
                             </div>
                         </div>
-                        <div class="col-md-6 col-lg-3">
-                            <div class="feature-step">
-                                <div class="step-icon-container">
-                                    <div class="step-number">2</div>
-                                    <div class="feature-icon">🖼️</div>
-                                </div>
-                                <div class="step-content">
-                                    <h5>Extract Images</h5>
-                                    <p class="text-muted">Images from all pages are automatically identified and extracted for side-by-side comparison</p>
-                                </div>
+                        <div class="workflow-step backend-step">
+                            <div class="step-icon">
+                                <div class="icon-content">🖼️</div>
+                            </div>
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h5>Extract Images</h5>
+                                <p>Images are extracted</p>
                             </div>
                         </div>
-                        <div class="col-md-6 col-lg-3">
-                            <div class="feature-step">
-                                <div class="step-icon-container">
-                                    <div class="step-number">3</div>
-                                    <div class="feature-icon">🤖</div>
-                                </div>
-                                <div class="step-content">
-                                    <h5>AI Analysis</h5>
-                                    <p class="text-muted">Our AI carefully analyzes differences and provides intelligent insights about the changes</p>
-                                </div>
+                        <div class="workflow-step backend-step">
+                            <div class="step-icon">
+                                <div class="icon-content">📝</div>
+                            </div>
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h5>Extract Text</h5>
+                                <p>Text is processed</p>
                             </div>
                         </div>
-                        <div class="col-md-6 col-lg-3">
-                            <div class="feature-step">
-                                <div class="step-icon-container">
-                                    <div class="step-number">4</div>
-                                    <div class="feature-icon">🔍</div>
-                                </div>
-                                <div class="step-content">
-                                    <h5>Visual Results</h5>
-                                    <p class="text-muted">Get detailed visual comparison with color highlighting to easily identify all changes</p>
-                                </div>
+                        <div class="workflow-step backend-step">
+                            <div class="step-icon">
+                                <div class="icon-content">🤖</div>
+                            </div>
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h5>AI Analysis</h5>
+                                <p>AI analyzes differences</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step user-step">
+                            <div class="step-icon">
+                                <div class="icon-content">🔍</div>
+                            </div>
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h5>Visual Results</h5>
+                                <p>See highlighted changes</p>
                             </div>
                         </div>
                     </div>
@@ -188,138 +189,201 @@
         margin-bottom: 1rem;
     }
     
-    /* Enhanced feature steps */
-    .steps-container {
-        padding: 2rem 0;
-        margin-bottom: 2rem;
-    }
-    
-    .steps-connector {
-        position: absolute;
-        top: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80%;
-        height: 4px;
-        background: linear-gradient(to right, var(--primary), var(--secondary));
-        z-index: 1;
-    }
-    
-    .feature-step {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        padding: 1rem;
-        position: relative;
-        z-index: 2;
-        height: 100%;
-        transition: all 0.3s ease;
-    }
-    
-    .feature-step:hover {
-        transform: translateY(-10px);
-    }
-    
-    .step-icon-container {
-        position: relative;
-        margin-bottom: 1.5rem;
-    }
-    
-    .step-number {
-        position: absolute;
-        top: -10px;
-        right: -10px;
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        background-color: var(--primary);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    /* Form help text styles - explicitly dark in light mode, white in dark mode */
+    .form-help-text {
+        color: #000000 !important;
         font-weight: 600;
-        font-family: 'Montserrat', sans-serif;
-        box-shadow: 0 4px 8px rgba(3, 78, 145, 0.2);
-        z-index: 3;
     }
     
-    .feature-step:nth-child(2) .step-number {
-        background-color: var(--accent-blue);
+    @media (prefers-color-scheme: dark) {
+        .form-help-text {
+            color: #ffffff !important;
+        }
     }
     
-    .feature-step:nth-child(3) .step-number {
-        background-color: var(--secondary);
+    /* Modern workflow style */
+    .workflow-container {
+        margin: 2rem 0 3rem;
+        overflow-x: auto; /* Allow horizontal scroll on small screens */
     }
     
-    .feature-step:nth-child(4) .step-number {
-        background-color: var(--accent-green);
+    .workflow-steps {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        min-width: 100%;
+        padding: 0.5rem;
     }
     
-    .feature-icon {
+    .workflow-step {
+        flex: 1;
+        min-width: 120px;
+        position: relative;
+        padding: 1rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        z-index: 1;
+        margin: 0 5px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Remove margin between steps */
+    .workflow-step:not(:last-child) {
+        margin-right: 0;
+    }
+    
+    /* Step icons */
+    .step-icon {
         width: 80px;
         height: 80px;
         border-radius: 50%;
-        background-color: rgba(3, 78, 145, 0.1);
+        margin: 0 auto 1rem;
+        position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 2rem;
         transition: all 0.3s ease;
+        border: 2px solid transparent;
+        z-index: 2;
     }
     
-    .feature-step:hover .feature-icon {
-        transform: scale(1.1);
+    .icon-content {
+        position: relative;
+        z-index: 2;
+        font-size: 2rem;
+    }
+    
+    .user-step .step-icon {
+        background-color: rgba(3, 78, 145, 0.1);
+        border-color: var(--primary);
+    }
+    
+    .backend-step .step-icon {
+        background-color: rgba(128, 128, 128, 0.08);
+        border-color: var(--secondary);
+    }
+    
+    /* Step numbers */
+    .step-number {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
         background-color: var(--primary);
         color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 3;
     }
     
-    .feature-step:nth-child(2):hover .feature-icon {
-        background-color: var(--accent-blue);
-    }
-    
-    .feature-step:nth-child(3):hover .feature-icon {
+    .backend-step .step-number {
         background-color: var(--secondary);
     }
     
-    .feature-step:nth-child(4):hover .feature-icon {
-        background-color: var(--accent-green);
-    }
-    
+    /* Step content */
     .step-content {
-        padding: 1rem;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
+        padding: 0.5rem 0;
+        position: relative;
+        z-index: 2;
     }
     
     .step-content h5 {
-        font-family: 'Montserrat', sans-serif;
+        font-size: 1.1rem;
         font-weight: 600;
-        margin-bottom: 0.75rem;
-        color: var(--primary);
+        margin-bottom: 0.3rem;
     }
     
-    .feature-step:nth-child(2) .step-content h5 {
-        color: var(--accent-blue);
+    .step-content p {
+        font-size: 0.9rem;
+        color: var(--text-muted, #6c757d);
+        margin-bottom: 0;
     }
     
-    .feature-step:nth-child(3) .step-content h5 {
-        color: var(--secondary);
+    /* Hover effects */
+    .workflow-step:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     }
     
-    .feature-step:nth-child(4) .step-content h5 {
-        color: var(--accent-green);
+    .user-step:hover {
+        background-color: rgba(13, 110, 253, 0.15);
+        border-color: var(--primary);
     }
     
-    @media (max-width: 992px) {
-        .steps-connector {
-            display: none;
+    .backend-step:hover {
+        background-color: rgba(40, 167, 69, 0.15);
+        border-color: var(--success, #28a745);
+    }
+    
+    .workflow-step:hover .step-icon {
+        transform: scale(1.05);
+    }
+    
+    :root {
+        --text-color: #212529;
+        --text-muted: #6c757d;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+        .form-help-text {
+            color: #ffffff !important;
         }
         
-        .feature-step {
-            margin-bottom: 2rem;
+        :root {
+            --text-color: #f8f9fa;
+            --text-muted: #adb5bd;
+        }
+        
+        .user-step {
+            background-color: rgba(13, 110, 253, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .backend-step {
+            background-color: rgba(173, 181, 189, 0.05);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .user-step .step-icon {
+            background-color: rgba(13, 110, 253, 0.15);
+        }
+        
+        .backend-step .step-icon {
+            background-color: rgba(173, 181, 189, 0.1);
+        }
+        
+        .user-step:hover {
+            background-color: rgba(13, 110, 253, 0.1);
+            border-color: rgba(13, 110, 253, 0.3);
+        }
+        
+        .backend-step:hover {
+            background-color: rgba(173, 181, 189, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+    }
+    
+    /* Ensure responsive behavior */
+    @media (max-width: 768px) {
+        .workflow-steps {
+            justify-content: flex-start;
+            min-width: 700px; /* Ensure steps don't squish too much */
+        }
+        
+        .workflow-container {
+            padding-bottom: 1rem;
         }
     }
 </style>
+
 {% endblock %}

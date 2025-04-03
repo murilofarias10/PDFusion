@@ -6,11 +6,48 @@
         <div class="text-center mb-3">
             <h2 class="fw-bold">Comparison Results</h2>
         </div>
-
-        <!-- AI Analysis Section - Removed -->
+        
+        <!-- Modification Level Indicator -->
+        <div class="card mb-5">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Modification Level Analysis by IA</h5>
+                <div class="d-flex align-items-center mb-2">
+                    <div class="w-100">
+                        <div class="progress" style="height: 25px;">
+                            {% set mod_percent = modification_percentage|default(0) %}
+                            {% if mod_percent <= 30 %}
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ mod_percent if mod_percent > 0 else 100 }}%;" 
+                                    aria-valuenow="{{ mod_percent }}" aria-valuemin="0" aria-valuemax="100">
+                                    {% if mod_percent > 0 %}
+                                        <strong>{{ mod_percent }}% Modified</strong>
+                                    {% else %}
+                                        <strong>No differences detected</strong>
+                                    {% endif %}
+                                </div>
+                            {% elif mod_percent <= 70 %}
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ mod_percent }}%;" 
+                                    aria-valuenow="{{ mod_percent }}" aria-valuemin="0" aria-valuemax="100">
+                                    <strong>{{ mod_percent }}% Modified</strong>
+                                </div>
+                            {% else %}
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: {{ mod_percent }}%;" 
+                                    aria-valuenow="{{ mod_percent }}" aria-valuemin="0" aria-valuemax="100">
+                                    <strong>{{ mod_percent }}% Modified</strong>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="badge bg-success">Low (0-30%)</span>
+                    <span class="badge bg-warning text-dark">Medium (31-70%)</span>
+                    <span class="badge bg-danger">High (71-100%)</span>
+                </div>
+            </div>
+        </div>
 
         <!-- Pagination controls for multi-page documents - ALWAYS VISIBLE -->
-        <div class="pagination-controls mb-3">
+        <div class="pagination-controls mb-5">
             <button class="page-button" id="prev-page" disabled>
                 <i class="bi bi-chevron-left"></i> Previous Page
             </button>
@@ -23,7 +60,7 @@
         </div>
 
         <!-- Visual Comparison Section - Always visible -->
-        <div class="row g-3 mb-3">
+        <div class="row g-3 mb-5">
             <div class="col-md-6">
                 <div class="card h-100">
                     <div class="card-header bg-danger bg-opacity-10 text-danger d-flex align-items-center">
@@ -55,17 +92,17 @@
         </div>
 
         <!-- Zoom Controls -->
-        <div class="zoom-controls mb-3">
+        <div class="zoom-controls mb-5 d-flex justify-content-center">
             <button class="btn btn-outline-primary" onclick="zoomIn()">
                 <i class="bi bi-zoom-in me-1"></i> Zoom In
             </button>
-            <button class="btn btn-outline-primary" onclick="zoomOut()">
+            <button class="btn btn-outline-primary mx-2" onclick="zoomOut()">
                 <i class="bi bi-zoom-out me-1"></i> Zoom Out
             </button>
-            <button class="btn btn-outline-secondary" onclick="resetZoom()">
+            <button class="btn btn-outline-secondary me-2" onclick="resetZoom()">
                 <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
             </button>
-            <div class="d-flex align-items-center ms-2">
+            <div class="d-flex align-items-center">
                 <input type="number" id="zoomInput" value="100" min="25" max="500" step="5"
                     class="form-control text-center" style="width: 80px;" onchange="setZoom(this.value)">
                 <span class="ms-2">%</span>
@@ -73,7 +110,7 @@
         </div>
 
         <!-- Text Comparison Section - Always visible -->
-        <div class="row g-3 mb-3" id="text-comparison-container">
+        <div class="row g-3 mb-5" id="text-comparison-container">
             <div class="col-md-6">
                 <div class="card h-100">
                     <div class="card-header bg-danger bg-opacity-10 text-danger d-flex align-items-center">
@@ -102,7 +139,7 @@
             </div>
         </div>
         
-        <div class="text-center">
+        <div class="text-center mt-5 mb-4 d-flex justify-content-center">
             <a href="/" class="btn btn-primary me-2">
                 <i class="bi bi-arrow-left me-2"></i>Compare New PDFs
             </a>
@@ -119,6 +156,109 @@
     var totalPagesFromServer = {% if total_pages is defined %}{{ total_pages }}{% else %}1{% endif %};
     var currentPage = 1;
     var isVisualComparison = true; // Always show visual comparison
+    
+    // Automatic modification calculation
+    document.addEventListener('DOMContentLoaded', function() {
+        // If modification percentage is not provided by the backend, calculate it
+        {% if not modification_percentage %}
+        // Wait a bit for images to load
+        setTimeout(function() {
+            calculateModificationPercentage();
+        }, 1000);
+        {% endif %}
+    });
+    
+    // Function to calculate modification percentage based on highlights
+    function calculateModificationPercentage() {
+        try {
+            // Get highlighted text elements
+            const textA = document.getElementById('text-a-content');
+            const textB = document.getElementById('text-b-content');
+            
+            // Count highlighted elements (spans with background color)
+            const highlightsInA = textA.querySelectorAll('span[style*="background-color"]').length;
+            const highlightsInB = textB.querySelectorAll('span[style*="background-color"]').length;
+            
+            // Get total text length as base for percentage calculation
+            const totalTextA = textA.textContent.length;
+            const totalTextB = textB.textContent.length;
+            
+            // Calculate percentage of differences
+            let totalTextLength = Math.max(totalTextA, totalTextB);
+            if (totalTextLength === 0) totalTextLength = 1; // Avoid division by zero
+            
+            // Calculate modification score (give more weight to larger changes)
+            const totalHighlights = highlightsInA + highlightsInB;
+            let modificationScore;
+            
+            if (totalHighlights === 0) {
+                // Check if there are visual differences in the images
+                const img1 = document.getElementById('img1');
+                const img2 = document.getElementById('img2');
+                
+                if (img1.src === img2.src) {
+                    modificationScore = 0; // Identical images and no text differences
+                } else {
+                    modificationScore = 5; // Different images but no text differences
+                }
+            } else {
+                // Base score on highlights, with a minimum of 5%
+                modificationScore = Math.max(5, Math.min(100, Math.round((totalHighlights / totalTextLength) * 1000)));
+            }
+            
+            // Update the progress bar
+            updateModificationBar(modificationScore);
+            
+            // Log for debugging
+            console.log(`Calculated modification: ${modificationScore}% (${totalHighlights} highlights in ${totalTextLength} chars)`);
+            
+            // Also try to get server-side calculation if available
+            fetch('/analyze_modification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.modification_percentage !== undefined) {
+                    // Use server calculation if available (more accurate)
+                    updateModificationBar(data.modification_percentage);
+                }
+            })
+            .catch(error => {
+                // If server analysis fails, we already have our client-side calculation
+                console.error('Server analysis error:', error);
+            });
+            
+        } catch (error) {
+            console.error('Error calculating modifications:', error);
+            // Fallback to a default value
+            updateModificationBar(10);
+        }
+    }
+    
+    // Update the modification progress bar
+    function updateModificationBar(percentage) {
+        const progressBar = document.querySelector('.progress-bar');
+        
+        // Ensure percentage is between 0-100
+        const safePercentage = Math.max(0, Math.min(100, percentage));
+        
+        // Update progress bar based on modification level
+        if (safePercentage <= 30) {
+            progressBar.className = 'progress-bar bg-success';
+        } else if (safePercentage <= 70) {
+            progressBar.className = 'progress-bar bg-warning';
+        } else {
+            progressBar.className = 'progress-bar bg-danger';
+        }
+        
+        // Update width and text
+        progressBar.style.width = safePercentage + '%';
+        progressBar.setAttribute('aria-valuenow', safePercentage);
+        progressBar.innerHTML = '<strong>' + safePercentage + '% Modified</strong>';
+    }
     
     // Add cleanup on page unload
     window.addEventListener('beforeunload', function() {
@@ -210,6 +350,31 @@
                         // Update the images with new content
                         document.getElementById('img1').src = data.img1_url;
                         document.getElementById('img2').src = data.img2_url;
+                        
+                        // Update UI based on page availability
+                        if (!data.has_page1) {
+                            // Modify the card header to indicate this page doesn't exist in PDF A
+                            document.querySelector('.card-header.bg-danger').innerHTML = 
+                                '<i class="bi bi-exclamation-triangle me-2"></i>' +
+                                '<h5 class="mb-0">PDF A - No page available (New page in PDF B)</h5>';
+                        } else {
+                            // Restore the original header
+                            document.querySelector('.card-header.bg-danger').innerHTML = 
+                                '<i class="bi bi-file-earmark-text me-2"></i>' +
+                                '<h5 class="mb-0">PDF A - Red Highlights (Deletions)</h5>';
+                        }
+                        
+                        if (!data.has_page2) {
+                            // Modify the card header to indicate this page doesn't exist in PDF B
+                            document.querySelector('.card-header.bg-success').innerHTML = 
+                                '<i class="bi bi-exclamation-triangle me-2"></i>' +
+                                '<h5 class="mb-0">PDF B - No page available (New page in PDF A)</h5>';
+                        } else {
+                            // Restore the original header
+                            document.querySelector('.card-header.bg-success').innerHTML = 
+                                '<i class="bi bi-file-earmark-text me-2"></i>' +
+                                '<h5 class="mb-0">PDF B - Green Highlights (Additions)</h5>';
+                        }
                     }
                 })
                 .catch(error => console.error('Error loading page:', error));
@@ -222,6 +387,31 @@
                         // Update the text content divs
                         document.getElementById('text-a-content').innerHTML = data.text_a;
                         document.getElementById('text-b-content').innerHTML = data.text_b;
+                        
+                        // Update UI based on text page availability
+                        if (!data.has_page1) {
+                            // Modify the text card header to indicate this page doesn't exist in PDF A
+                            document.querySelectorAll('.card-header.bg-danger')[1].innerHTML = 
+                                '<i class="bi bi-exclamation-triangle me-2"></i>' +
+                                '<h5 class="mb-0">Text from PDF A - No page available</h5>';
+                        } else {
+                            // Restore the original text header
+                            document.querySelectorAll('.card-header.bg-danger')[1].innerHTML = 
+                                '<i class="bi bi-file-text me-2"></i>' +
+                                '<h5 class="mb-0">Text from PDF A</h5>';
+                        }
+                        
+                        if (!data.has_page2) {
+                            // Modify the text card header to indicate this page doesn't exist in PDF B
+                            document.querySelectorAll('.card-header.bg-success')[1].innerHTML = 
+                                '<i class="bi bi-exclamation-triangle me-2"></i>' +
+                                '<h5 class="mb-0">Text from PDF B - No page available</h5>';
+                        } else {
+                            // Restore the original text header
+                            document.querySelectorAll('.card-header.bg-success')[1].innerHTML = 
+                                '<i class="bi bi-file-text me-2"></i>' +
+                                '<h5 class="mb-0">Text from PDF B</h5>';
+                        }
                     }
                 })
                 .catch(error => console.error('Error loading text page:', error));

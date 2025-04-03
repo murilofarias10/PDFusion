@@ -32,6 +32,81 @@ MAX_FILE_AGE_HOURS = 2
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+def determine_modification_level(text1, text2):
+    """
+    Determine the level of modification between two texts.
+    
+    Args:
+        text1 (str): Text from the first PDF
+        text2 (str): Text from the second PDF
+        
+    Returns:
+        dict: Contains level ('low', 'medium', 'high') and percentage values
+    """
+    # Split the texts into words
+    words1 = text1.lower().split()
+    words2 = text2.lower().split()
+    
+    # Calculate the total number of words
+    total_words = max(len(words1), len(words2))
+    if total_words == 0:
+        return {'level': 'low', 'percentage': 0}
+    
+    # Use difflib to get the differences
+    differ = difflib.Differ()
+    diff = list(differ.compare(words1, words2))
+    
+    # Count the modified words (additions and deletions)
+    modified_count = len([word for word in diff if word.startswith('+ ') or word.startswith('- ')])
+    
+    # Calculate the modification percentage
+    modification_percentage = min(100, round((modified_count / (total_words * 2)) * 100))
+    
+    # Determine the level based on the percentage with new thresholds
+    if modification_percentage <= 30:
+        level = 'low'
+    elif modification_percentage <= 70:
+        level = 'medium'
+    else:
+        level = 'high'
+    
+    # Try to also get LLM analysis if API key is available
+    llm_level = None
+    if openai.api_key:
+        try:
+            client = openai.OpenAI()
+            sample_diff = ' '.join(diff[:200])  # Take a sample of the diff for analysis
+            
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": (
+                            "Based on the diff between two documents, determine if the level of modification is low, medium, or high.\n"
+                            "Low: Minor changes, typos, formatting (0-30% changes).\n"
+                            "Medium: Some paragraphs changed, but overall structure remains (31-70% changes).\n"
+                            "High: Major changes, completely different sections, significant rewrites (71-100% changes).\n"
+                            "Output only 'low', 'medium', or 'high'. Here's the diff sample:\n\n"
+                            f"{sample_diff}"
+                        )
+                    }
+                ]
+            )
+            llm_level = response.choices[0].message.content.strip().lower()
+            
+            # If LLM gives valid response, use it
+            if llm_level in ['low', 'medium', 'high']:
+                level = llm_level
+        except Exception as e:
+            print("LLM analysis failed:", e)
+    
+    return {
+        'level': level,
+        'percentage': modification_percentage,
+        'llm_level': llm_level
+    }
+
 def cleanup_old_files():
     """
     Clean up old files in the uploads and output directories.
@@ -119,6 +194,7 @@ def clean_directory(directory, cutoff_time):
 cleanup_thread = threading.Thread(target=cleanup_old_files, daemon=True)
 cleanup_thread.start()
 
+#Convert pdf to image. and highlight the difference in def highlight_differences
 def render_pdf_to_image(pdf_path, page_num=0, zoom=2):
     doc = fitz.open(pdf_path)
     page = doc.load_page(page_num)
@@ -128,6 +204,7 @@ def render_pdf_to_image(pdf_path, page_num=0, zoom=2):
     doc.close()
     return img
 
+#Extract text from pdf im analyzing the text in diff_texts(text1, text2)
 def extract_text_from_pdf(pdf_path, page_num=None):
     doc = fitz.open(pdf_path)
     text = ""
@@ -144,6 +221,7 @@ def extract_text_from_pdf(pdf_path, page_num=None):
     doc.close()
     return text.strip()
 
+#Highlight differences between two images. after converting to image. in def render_pdf_to_image
 def highlight_differences(img1, img2):
     img1 = img1.convert("RGB")
     img2 = img2.convert("RGB")
@@ -168,6 +246,7 @@ def highlight_differences(img1, img2):
 
     return highlight_a, highlight_b
 
+#Diff text after extracting from def extract_text_from_pdf here im analyzing the text
 def diff_texts(text1, text2):
     differ = difflib.Differ()
     
@@ -203,6 +282,7 @@ def diff_texts(text1, text2):
 
     return ' '.join(text_a), ' '.join(text_b)
 
+#Check if the pdf is a drawing or text using LLM openai
 def is_drawing_pdf(text):
     plain_text = re.sub(r'[^a-zA-Z\n\s]', '', text)
     word_count = len(plain_text.split())
@@ -234,6 +314,7 @@ def is_drawing_pdf(text):
         print("LLM analysis failed:", e)
         return True
 
+#Extract images from pdf and perform OCR on them.
 def extract_images_from_pdf(pdf_path, prefix="pdf"):
     """
     Extract images from a PDF file, save them to disk, and perform OCR on them.
@@ -461,7 +542,10 @@ def processing_done():
     user_files.append(highlight_b_path)
     session['user_files'] = user_files
     
-    # Remove AI analysis - no longer needed
+    # Determine the modification level
+    modification_data = determine_modification_level(text1, text2)
+    modification_level = modification_data['level']
+    modification_percentage = modification_data['percentage']
     
     # Pass the required data to the template without the analysis
     return render_template(
@@ -479,7 +563,9 @@ def processing_done():
         images2=session['images2'],
         image_count1=len(images1),
         image_count2=len(images2),
-        total_pages=total_pages
+        total_pages=total_pages,
+        modification_level=modification_level,
+        modification_percentage=modification_percentage
     )
 
 @app.route('/image/<filename>')
@@ -495,27 +581,62 @@ def get_page(page_num):
         return jsonify({'success': False, 'error': 'No PDF files found'})
 
     try:
-        # Generate images for the requested page
-        img1 = render_pdf_to_image(path1, page_num=page_num-1)
-        img2 = render_pdf_to_image(path2, page_num=page_num-1)
+        # Check if PDFs exist and get their page counts
+        doc1 = fitz.open(path1)
+        doc2 = fitz.open(path2)
+        
+        page_count1 = doc1.page_count
+        page_count2 = doc2.page_count
+        
+        # Check if the requested page exists in each PDF
+        has_page1 = 0 <= (page_num - 1) < page_count1
+        has_page2 = 0 <= (page_num - 1) < page_count2
         
         # Generate unique filenames for this page
         filename1 = f"pdf_a_page_{page_num}.png"
         filename2 = f"pdf_b_page_{page_num}.png"
         
-        # Save the images
         img1_path = os.path.join(OUTPUT_FOLDER, filename1)
         img2_path = os.path.join(OUTPUT_FOLDER, filename2)
         
-        img1.save(img1_path)
-        img2.save(img2_path)
-        
         # Track these files for cleanup
         user_files = session.get('user_files', [])
-        user_files.extend([img1_path, img2_path])
         
-        # Generate highlighted versions
-        highlight_a, highlight_b = highlight_differences(img1, img2)
+        # Generate placeholder images with "No page" message if needed
+        if not has_page1:
+            # Create a blank white image without text
+            img1 = Image.new('RGB', (800, 1000), color='white')
+            img1.save(img1_path)
+            user_files.append(img1_path)
+        else:
+            # Generate image for PDF A
+            img1 = render_pdf_to_image(path1, page_num=page_num-1)
+            img1.save(img1_path)
+            user_files.append(img1_path)
+        
+        if not has_page2:
+            # Create a blank white image without text
+            img2 = Image.new('RGB', (800, 1000), color='white')
+            img2.save(img2_path)
+            user_files.append(img2_path)
+        else:
+            # Generate image for PDF B
+            img2 = render_pdf_to_image(path2, page_num=page_num-1)
+            img2.save(img2_path)
+            user_files.append(img2_path)
+        
+        # Close the PDF documents
+        doc1.close()
+        doc2.close()
+        
+        # Generate highlighted versions only if both pages exist
+        if has_page1 and has_page2:
+            highlight_a, highlight_b = highlight_differences(img1, img2)
+        else:
+            # If one page doesn't exist, just use the original images without highlighting
+            highlight_a = img1
+            highlight_b = img2
+            
         highlight_a_path = os.path.join(OUTPUT_FOLDER, f"highlighted_{filename1}")
         highlight_b_path = os.path.join(OUTPUT_FOLDER, f"highlighted_{filename2}")
         
@@ -529,7 +650,9 @@ def get_page(page_num):
         return jsonify({
             'success': True,
             'img1_url': url_for('get_image', filename=f"highlighted_{filename1}"),
-            'img2_url': url_for('get_image', filename=f"highlighted_{filename2}")
+            'img2_url': url_for('get_image', filename=f"highlighted_{filename2}"),
+            'has_page1': has_page1,
+            'has_page2': has_page2
         })
     except Exception as e:
         print(f"Error generating page {page_num}:", e)
@@ -544,12 +667,46 @@ def get_text_page(page_num):
         return jsonify({'success': False, 'error': 'No PDF files found'})
 
     try:
-        # Get text from the specific page (0-based index)
-        text1 = extract_text_from_pdf(path1, page_num - 1)
-        text2 = extract_text_from_pdf(path2, page_num - 1)
+        # Check if PDFs exist and get their page counts
+        doc1 = fitz.open(path1)
+        doc2 = fitz.open(path2)
         
-        # Generate diff for this page
-        diff_text_a, diff_text_b = diff_texts(text1, text2)
+        page_count1 = doc1.page_count
+        page_count2 = doc2.page_count
+        
+        # Check if the requested page exists in each PDF
+        has_page1 = 0 <= (page_num - 1) < page_count1
+        has_page2 = 0 <= (page_num - 1) < page_count2
+        
+        # Close the documents after checking
+        doc1.close()
+        doc2.close()
+        
+        # Get text from the specific page or use placeholder text
+        if has_page1:
+            text1 = extract_text_from_pdf(path1, page_num - 1)
+        else:
+            text1 = "No content on this page - this is a new page in the other document."
+            
+        if has_page2:
+            text2 = extract_text_from_pdf(path2, page_num - 1)
+        else:
+            text2 = "No content on this page - this is a new page in the other document."
+        
+        # Generate diff only if both pages exist, otherwise just format the text
+        if has_page1 and has_page2:
+            diff_text_a, diff_text_b = diff_texts(text1, text2)
+        else:
+            # If one page doesn't exist, just format the text without diff
+            if has_page1:
+                diff_text_a = text1
+                diff_text_b = "<span class='added'>This is a new page that doesn't exist in Document A</span>"
+            elif has_page2:
+                diff_text_a = "<span class='removed'>This is a new page that doesn't exist in Document B</span>"
+                diff_text_b = text2
+            else:
+                diff_text_a = "Page not found in either document."
+                diff_text_b = "Page not found in either document."
         
         # Save text for download if needed
         page_diff_a_filename = save_extracted_content(diff_text_a, f"pdf1_page{page_num}_diff_text")
@@ -564,7 +721,9 @@ def get_text_page(page_num):
         return jsonify({
             'success': True,
             'text_a': diff_text_a,
-            'text_b': diff_text_b
+            'text_b': diff_text_b,
+            'has_page1': has_page1,
+            'has_page2': has_page2
         })
     except Exception as e:
         print(f"Error generating text page {page_num}:", e)
