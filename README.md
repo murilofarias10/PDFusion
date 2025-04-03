@@ -6,7 +6,7 @@ PDFusion is an AI-powered PDF comparison tool that helps you identify difference
 
 Visit our [Demo Website](https://murilofarias10.github.io/PDFusion/) to see how the interface looks.
 
-**Note:** The GitHub Pages demo is a static version showing the UI only. For full functionality, you need to run the Flask application locally.
+**Note:** The GitHub Pages demo is a static version showing the UI only.
 
 ## Features
 
@@ -16,36 +16,6 @@ Visit our [Demo Website](https://murilofarias10.github.io/PDFusion/) to see how 
 - AI-powered analysis of differences
 - Works with both text-heavy documents and diagrams/drawings
 
-## Running Locally
-
-To run the full application locally with all features:
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/murilofarias10/PDFusion.git
-   cd PDFusion
-   ```
-
-2. Install dependencies:
-   ```
-   pip install flask fitz Pillow difflib openai pytesseract
-   ```
-
-3. Set your OpenAI API key (optional, but recommended for AI-powered analysis):
-   ```
-   export OPENAI_API_KEY=your_api_key_here
-   ```
-
-4. Run the Flask application:
-   ```
-   python app.py
-   ```
-
-5. Open your browser and navigate to:
-   ```
-   http://localhost:5000
-   ```
-
 ## How It Works
 
 1. **Upload** - Upload your original and modified PDF documents
@@ -54,15 +24,20 @@ To run the full application locally with all features:
 4. **Analyze** - AI analyzes the significance of the changes
 5. **Compare** - View highlighted differences in an easy-to-understand format
 
-## Requirements
+![image](https://github.com/user-attachments/assets/37d3307a-2475-4bcf-b60a-7429e026118b)
 
-- Python 3.7+
-- Flask
-- PyMuPDF (fitz)
-- Pillow
-- OpenAI Python library (for AI analysis)
-- Tesseract OCR (for image text extraction)
+![image](https://github.com/user-attachments/assets/1650c8c0-5b43-4a5c-a797-72fdfc57cfbe)
+
+![image](https://github.com/user-attachments/assets/1c76b117-4486-4d9c-a036-0247d4de6db8)
+
+![image](https://github.com/user-attachments/assets/a78b39ce-b272-4078-b61d-4fa0eacd9873)
+
+![image](https://github.com/user-attachments/assets/ae1eefac-c3ab-4e16-9410-aff2e2398a05)
+
+![image](https://github.com/user-attachments/assets/792fef06-3677-4664-9f96-eae90260fa3b)
 
 ## Contact
+Murilo Farias
+Canada +1 672 727 8005
+Brazil +55 16 993637676
 
-For questions or issues, please open an issue on GitHub.
