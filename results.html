@@ -1,523 +1,498 @@
-{% extends 'base.html' %}
-{% block title %}Comparison Results{% endblock %}
-{% block content %}
-<section class="py-3">
-    <div class="container">
-        <div class="text-center mb-3">
-            <h2 class="fw-bold">Comparison Results</h2>
-        </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDFusion - Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="static/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="static/images/favicon.png">
+    <style>
+        .pdf-container {
+            max-height: 800px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+        }
         
-        <!-- Modification Level Indicator -->
-        <div class="card mb-5">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Modification Level Analysis by IA</h5>
-                <div class="d-flex align-items-center mb-2">
-                    <div class="w-100">
-                        <div class="progress" style="height: 25px;">
-                            {% set mod_percent = modification_percentage|default(0) %}
-                            {% if mod_percent <= 30 %}
-                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ mod_percent if mod_percent > 0 else 100 }}%;" 
-                                    aria-valuenow="{{ mod_percent }}" aria-valuemin="0" aria-valuemax="100">
-                                    {% if mod_percent > 0 %}
-                                        <strong>{{ mod_percent }}% Modified</strong>
-                                    {% else %}
-                                        <strong>No differences detected</strong>
-                                    {% endif %}
-                                </div>
-                            {% elif mod_percent <= 70 %}
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ mod_percent }}%;" 
-                                    aria-valuenow="{{ mod_percent }}" aria-valuemin="0" aria-valuemax="100">
-                                    <strong>{{ mod_percent }}% Modified</strong>
-                                </div>
-                            {% else %}
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: {{ mod_percent }}%;" 
-                                    aria-valuenow="{{ mod_percent }}" aria-valuemin="0" aria-valuemax="100">
-                                    <strong>{{ mod_percent }}% Modified</strong>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <span class="badge bg-success">Low (0-30%)</span>
-                    <span class="badge bg-warning text-dark">Medium (31-70%)</span>
-                    <span class="badge bg-danger">High (71-100%)</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pagination controls for multi-page documents - ALWAYS VISIBLE -->
-        <div class="pagination-controls mb-5">
-            <button class="page-button" id="prev-page" disabled>
-                <i class="bi bi-chevron-left"></i> Previous Page
-            </button>
-            <div class="page-indicator">
-                Page <span id="current-page">1</span> of <span id="total-pages">1</span>
-            </div>
-            <button class="page-button" id="next-page" disabled>
-                Next Page <i class="bi bi-chevron-right"></i>
-            </button>
-        </div>
-
-        <!-- Visual Comparison Section - Always visible -->
-        <div class="row g-3 mb-5">
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header bg-danger bg-opacity-10 text-danger d-flex align-items-center">
-                        <i class="bi bi-file-earmark-text me-2"></i>
-                        <h5 class="mb-0">PDF A - Red Highlights (Deletions)</h5>
-                    </div>
-                    <div class="card-body p-2">
-                        <div class="border rounded p-2 position-relative" style="overflow:auto; height:50vh;">
-                            <img id="img1" src="{{ url_for('get_image', filename='pdf_a_highlighted.png') }}"
-                                class="img-fluid" style="transform-origin: top left; transition: transform 0.3s;">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header bg-success bg-opacity-10 text-success d-flex align-items-center">
-                        <i class="bi bi-file-earmark-text me-2"></i>
-                        <h5 class="mb-0">PDF B - Green Highlights (Additions)</h5>
-                    </div>
-                    <div class="card-body p-2">
-                        <div class="border rounded p-2 position-relative" style="overflow:auto; height:50vh;">
-                            <img id="img2" src="{{ url_for('get_image', filename='pdf_b_highlighted.png') }}"
-                                class="img-fluid" style="transform-origin: top left; transition: transform 0.3s;">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Zoom Controls -->
-        <div class="zoom-controls mb-5 d-flex justify-content-center">
-            <button class="btn btn-outline-primary" onclick="zoomIn()">
-                <i class="bi bi-zoom-in me-1"></i> Zoom In
-            </button>
-            <button class="btn btn-outline-primary mx-2" onclick="zoomOut()">
-                <i class="bi bi-zoom-out me-1"></i> Zoom Out
-            </button>
-            <button class="btn btn-outline-secondary me-2" onclick="resetZoom()">
-                <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
-            </button>
-            <div class="d-flex align-items-center">
-                <input type="number" id="zoomInput" value="100" min="25" max="500" step="5"
-                    class="form-control text-center" style="width: 80px;" onchange="setZoom(this.value)">
-                <span class="ms-2">%</span>
-            </div>
-        </div>
-
-        <!-- Text Comparison Section - Always visible -->
-        <div class="row g-3 mb-5" id="text-comparison-container">
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header bg-danger bg-opacity-10 text-danger d-flex align-items-center">
-                        <i class="bi bi-file-text me-2"></i>
-                        <h5 class="mb-0">Text from PDF A</h5>
-                    </div>
-                    <div class="card-body p-2">
-                        <div id="text-a-content" class="pdf-text-content bg-light border p-3 rounded" style="white-space: pre-wrap; max-height: 50vh; overflow-y: auto;">
-                            {{ diff_text_a|safe }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header bg-success bg-opacity-10 text-success d-flex align-items-center">
-                        <i class="bi bi-file-text me-2"></i>
-                        <h5 class="mb-0">Text from PDF B</h5>
-                    </div>
-                    <div class="card-body p-2">
-                        <div id="text-b-content" class="pdf-text-content bg-light border p-3 rounded" style="white-space: pre-wrap; max-height: 50vh; overflow-y: auto;">
-                            {{ diff_text_b|safe }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        .pdf-image {
+            width: 100%;
+            height: auto;
+        }
         
-        <div class="text-center mt-5 mb-4 d-flex justify-content-center">
-            <a href="/" class="btn btn-primary me-2">
-                <i class="bi bi-arrow-left me-2"></i>Compare New PDFs
-            </a>
-            <button class="btn btn-secondary" onclick="window.print()">
-                <i class="bi bi-printer me-2"></i>Print Results
-            </button>
-        </div>
-    </div>
-</section>
+        .text-comparison-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            background-color: var(--background-alt);
+        }
+        
+        .removed {
+            background-color: rgba(255, 0, 0, 0.2);
+            color: #e53e3e;
+            padding: 0 2px;
+            border-radius: 2px;
+            text-decoration: line-through;
+        }
+        
+        .added {
+            background-color: rgba(0, 128, 0, 0.2);
+            color: #38a169;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+        
+        .dark .removed {
+            background-color: rgba(255, 0, 0, 0.3);
+            color: #fc8181;
+        }
+        
+        .dark .added {
+            background-color: rgba(0, 255, 0, 0.15);
+            color: #68d391;
+        }
+        
+        .page-controls {
+            margin: 1rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" href="/">
+                    <span class="logo-icon-container">
+                        <img src="static/images/logo.png" alt="PDFusion Logo" class="img-fluid logo-img">
+                    </span>
+                    PDFusion
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html#how-it-works">How It Works</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html#pricing">Pricing</a>
+                        </li>
+                        <li class="nav-item">
+                            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="sun-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="moon-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
 
-<!-- Set template variables for JS -->
-<script>
-    // Pass backend data to JavaScript
-    var totalPagesFromServer = {% if total_pages is defined %}{{ total_pages }}{% else %}1{% endif %};
-    var currentPage = 1;
-    var isVisualComparison = true; // Always show visual comparison
-    
-    // Automatic modification calculation
-    document.addEventListener('DOMContentLoaded', function() {
-        // If modification percentage is not provided by the backend, calculate it
-        {% if not modification_percentage %}
-        // Wait a bit for images to load
-        setTimeout(function() {
-            calculateModificationPercentage();
-        }, 1000);
-        {% endif %}
-    });
-    
-    // Function to calculate modification percentage based on highlights
-    function calculateModificationPercentage() {
-        try {
-            // Get highlighted text elements
-            const textA = document.getElementById('text-a-content');
-            const textB = document.getElementById('text-b-content');
+    <main>
+        <div class="container py-4">
+            <h1 class="mb-4">Comparison Results</h1>
             
-            // Count highlighted elements (spans with background color)
-            const highlightsInA = textA.querySelectorAll('span[style*="background-color"]').length;
-            const highlightsInB = textB.querySelectorAll('span[style*="background-color"]').length;
+            <!-- Summary Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4 class="card-title">Analysis Summary</h4>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>Demo Mode:</strong> This is a static demonstration of how the results would appear. In the actual application, you would see real comparison data.
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5>Modification Level: <span class="badge bg-warning">Medium</span></h5>
+                            <div class="progress mt-2 mb-3" style="height: 15px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 55%;" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100">55%</div>
+                            </div>
+                            <p>This document has undergone moderate changes, with approximately 55% of the content being modified.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Content Overview</h5>
+                            <ul>
+                                <li>Original document: 10 pages</li>
+                                <li>Modified document: 12 pages</li>
+                                <li>5 images extracted from Document A</li>
+                                <li>7 images extracted from Document B</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
-            // Get total text length as base for percentage calculation
-            const totalTextA = textA.textContent.length;
-            const totalTextB = textB.textContent.length;
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-tabs mb-4" id="resultsTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="visual-tab" data-bs-toggle="tab" data-bs-target="#visual-content" type="button" role="tab" aria-controls="visual-content" aria-selected="true">
+                        <i class="bi bi-eye me-1"></i> Visual Comparison
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="text-tab" data-bs-toggle="tab" data-bs-target="#text-content" type="button" role="tab" aria-controls="text-content" aria-selected="false">
+                        <i class="bi bi-body-text me-1"></i> Text Comparison
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="images-tab" data-bs-toggle="tab" data-bs-target="#images-content" type="button" role="tab" aria-controls="images-content" aria-selected="false">
+                        <i class="bi bi-card-image me-1"></i> Images (12)
+                    </button>
+                </li>
+            </ul>
             
-            // Calculate percentage of differences
-            let totalTextLength = Math.max(totalTextA, totalTextB);
-            if (totalTextLength === 0) totalTextLength = 1; // Avoid division by zero
-            
-            // Calculate modification score (give more weight to larger changes)
-            const totalHighlights = highlightsInA + highlightsInB;
-            let modificationScore;
-            
-            if (totalHighlights === 0) {
-                // Check if there are visual differences in the images
-                const img1 = document.getElementById('img1');
-                const img2 = document.getElementById('img2');
+            <!-- Tab Content -->
+            <div class="tab-content" id="resultsTabContent">
+                <!-- Visual Comparison Tab -->
+                <div class="tab-pane fade show active" id="visual-content" role="tabpanel" aria-labelledby="visual-tab">
+                    <!-- Page Controls -->
+                    <div class="page-controls">
+                        <button class="btn btn-outline-primary" id="prev-page" disabled>
+                            <i class="bi bi-chevron-left"></i> Previous
+                        </button>
+                        <span class="mx-3">Page <span id="current-page">1</span> of <span id="total-pages">12</span></span>
+                        <button class="btn btn-outline-primary" id="next-page">
+                            Next <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- PDF View -->
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header bg-primary text-white">
+                                    Document A (Original)
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="pdf-container">
+                                        <img src="https://via.placeholder.com/800x1100/f8f9fa/333333?text=Document+A+-+Page+1+(Placeholder)" class="pdf-image" alt="Document A Page 1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header bg-primary text-white">
+                                    Document B (Modified)
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="pdf-container">
+                                        <img src="https://via.placeholder.com/800x1100/f8f9fa/333333?text=Document+B+-+Page+1+(Placeholder)" class="pdf-image" alt="Document B Page 1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
-                if (img1.src === img2.src) {
-                    modificationScore = 0; // Identical images and no text differences
-                } else {
-                    modificationScore = 5; // Different images but no text differences
-                }
-            } else {
-                // Base score on highlights, with a minimum of 5%
-                modificationScore = Math.max(5, Math.min(100, Math.round((totalHighlights / totalTextLength) * 1000)));
+                <!-- Text Comparison Tab -->
+                <div class="tab-pane fade" id="text-content" role="tabpanel" aria-labelledby="text-tab">
+                    <!-- Page Controls -->
+                    <div class="page-controls">
+                        <button class="btn btn-outline-primary" id="prev-text-page" disabled>
+                            <i class="bi bi-chevron-left"></i> Previous
+                        </button>
+                        <span class="mx-3">Page <span id="current-text-page">1</span> of <span id="total-text-pages">12</span></span>
+                        <button class="btn btn-outline-primary" id="next-text-page">
+                            Next <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Text View -->
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header bg-primary text-white">
+                                    Document A (Original)
+                                </div>
+                                <div class="card-body">
+                                    <div class="text-comparison-container">
+                                        <p>This is a <span class="removed">sample document</span> text showing how differences would appear in the <span class="removed">original document</span>.</p>
+                                        <p>Some text remains <span class="removed">unchanged</span> while other parts are highlighted to show what's been removed or added.</p>
+                                        <p>This paragraph is the same in both documents and shows no differences.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header bg-primary text-white">
+                                    Document B (Modified)
+                                </div>
+                                <div class="card-body">
+                                    <div class="text-comparison-container">
+                                        <p>This is a <span class="added">demonstration</span> text showing how differences would appear in the <span class="added">modified document</span>.</p>
+                                        <p>Some text remains <span class="added">the same</span> while other parts are highlighted to show what's been removed or added.</p>
+                                        <p>This paragraph is the same in both documents and shows no differences.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Images Tab -->
+                <div class="tab-pane fade" id="images-content" role="tabpanel" aria-labelledby="images-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Images in Document A (5)</h4>
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <div class="card">
+                                        <img src="https://via.placeholder.com/300x200/f8f9fa/333333?text=Image+1" class="card-img-top" alt="Image 1">
+                                        <div class="card-body">
+                                            <p class="card-text small">Page 1</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="card">
+                                        <img src="https://via.placeholder.com/300x200/f8f9fa/333333?text=Image+2" class="card-img-top" alt="Image 2">
+                                        <div class="card-body">
+                                            <p class="card-text small">Page 2</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="card">
+                                        <img src="https://via.placeholder.com/300x200/f8f9fa/333333?text=Image+3" class="card-img-top" alt="Image 3">
+                                        <div class="card-body">
+                                            <p class="card-text small">Page 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="card">
+                                        <img src="https://via.placeholder.com/300x200/f8f9fa/333333?text=Image+4" class="card-img-top" alt="Image 4">
+                                        <div class="card-body">
+                                            <p class="card-text small">Page 5</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="card">
+                                        <img src="https://via.placeholder.com/300x200/f8f9fa/333333?text=Image+5" class="card-img-top" alt="Image 5">
+                                        <div class="card-body">
+                                            <p class="card-text small">Page 6</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Images in Document B (7)</h4>
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <div class="card">
+                                        <img src="https://via.placeholder.com/300x200/f8f9fa/333333?text=Image+1" class="card-img-top" alt="Image 1">
+                                        <div class="card-body">
+                                            <p class="card-text small">Page 1</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="card">
+                                        <img src="https://via.placeholder.com/300x200/f8f9fa/333333?text=Image+2" class="card-img-top" alt="Image 2">
+                                        <div class="card-body">
+                                            <p class="card-text small">Page 2</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="card">
+                                        <img src="https://via.placeholder.com/300x200/f8f9fa/333333?text=Image+3" class="card-img-top" alt="Image 3">
+                                        <div class="card-body">
+                                            <p class="card-text small">Page 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="card">
+                                        <img src="https://via.placeholder.com/300x200/f8f9fa/333333?text=New+Image" class="card-img-top" alt="New Image">
+                                        <div class="card-body">
+                                            <p class="card-text small text-success">Page 4 (New)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="card">
+                                        <img src="https://via.placeholder.com/300x200/f8f9fa/333333?text=Image+4" class="card-img-top" alt="Image 4">
+                                        <div class="card-body">
+                                            <p class="card-text small">Page 5</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="card">
+                                        <img src="https://via.placeholder.com/300x200/f8f9fa/333333?text=Image+5" class="card-img-top" alt="Image 5">
+                                        <div class="card-body">
+                                            <p class="card-text small">Page 6</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="card">
+                                        <img src="https://via.placeholder.com/300x200/f8f9fa/333333?text=New+Image" class="card-img-top" alt="New Image">
+                                        <div class="card-body">
+                                            <p class="card-text small text-success">Page 7 (New)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="index.html" class="btn btn-primary btn-lg">
+                    <i class="bi bi-house-door me-1"></i> Return to Home
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="row align-items-center justify-content-between">
+                <div class="col-md-4 mb-4 mb-md-0 text-center text-md-start">
+                    <a class="navbar-brand" href="/">
+                        <span class="logo-icon-container">
+                            <img src="static/images/logo.png" alt="PDFusion Logo" class="img-fluid logo-img">
+                        </span>
+                        PDFusion
+                    </a>
+                    <p class="mt-3 text-muted">Intelligent PDF comparison with AI-powered insights.</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="footer-links">
+                        <a href="index.html#how-it-works">How It Works</a>
+                        <a href="index.html#pricing">Pricing</a>
+                        <a href="#contact">Contact</a>
+                        <a href="#privacy">Privacy</a>
+                        <a href="#terms">Terms</a>
+                    </div>
+                    <p class="mt-4 text-center text-muted">&copy; 2025 PDFusion - All rights reserved</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="sponsor-section text-center d-flex flex-column justify-content-center h-100">
+                        <a href="#sponsor" class="d-block">
+                            <img src="static/images/Sponsor_1_1.png" alt="Sponsor" class="img-fluid sponsor-image border-0" style="max-height: 80px;">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            // Check for saved theme preference or use preferred color scheme
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
             }
             
-            // Update the progress bar
-            updateModificationBar(modificationScore);
-            
-            // Log for debugging
-            console.log(`Calculated modification: ${modificationScore}% (${totalHighlights} highlights in ${totalTextLength} chars)`);
-            
-            // Also try to get server-side calculation if available
-            fetch('/analyze_modification', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.modification_percentage !== undefined) {
-                    // Use server calculation if available (more accurate)
-                    updateModificationBar(data.modification_percentage);
-                }
-            })
-            .catch(error => {
-                // If server analysis fails, we already have our client-side calculation
-                console.error('Server analysis error:', error);
+            // Toggle theme
+            themeToggle.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                const isDark = document.documentElement.classList.contains('dark');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
             });
             
-        } catch (error) {
-            console.error('Error calculating modifications:', error);
-            // Fallback to a default value
-            updateModificationBar(10);
-        }
-    }
-    
-    // Update the modification progress bar
-    function updateModificationBar(percentage) {
-        const progressBar = document.querySelector('.progress-bar');
-        
-        // Ensure percentage is between 0-100
-        const safePercentage = Math.max(0, Math.min(100, percentage));
-        
-        // Update progress bar based on modification level
-        if (safePercentage <= 30) {
-            progressBar.className = 'progress-bar bg-success';
-        } else if (safePercentage <= 70) {
-            progressBar.className = 'progress-bar bg-warning';
-        } else {
-            progressBar.className = 'progress-bar bg-danger';
-        }
-        
-        // Update width and text
-        progressBar.style.width = safePercentage + '%';
-        progressBar.setAttribute('aria-valuenow', safePercentage);
-        progressBar.innerHTML = '<strong>' + safePercentage + '% Modified</strong>';
-    }
-    
-    // Add cleanup on page unload
-    window.addEventListener('beforeunload', function() {
-        // Send cleanup request to server
-        navigator.sendBeacon('/cleanup');
-    });
-</script>
-
-<script>
-    let zoom = 1;
-
-    function applyZoom() {
-        document.getElementById('img1').style.transform = `scale(${zoom})`;
-        document.getElementById('img2').style.transform = `scale(${zoom})`;
-        document.getElementById('zoomInput').value = Math.round(zoom * 100);
-    }
-
-    function zoomIn() {
-        if (zoom < 5) {
-            zoom += 0.1;
-            applyZoom();
-        }
-    }
-
-    function zoomOut() {
-        if (zoom > 0.25) {
-            zoom -= 0.1;
-            applyZoom();
-        }
-    }
-
-    function resetZoom() {
-        zoom = 1;
-        applyZoom();
-    }
-
-    function setZoom(value) {
-        const parsed = parseFloat(value);
-        if (parsed >= 25 && parsed <= 500) {
-            zoom = parsed / 100;
-            applyZoom();
-        }
-    }
-    
-    // Document ready event
-    document.addEventListener('DOMContentLoaded', function() {
-        // PDF Pagination setup
-        setupPagination();
-    });
-
-    // Pagination functionality
-    function setupPagination() {
-        // Get pagination elements
-        const prevButton = document.getElementById('prev-page');
-        const nextButton = document.getElementById('next-page');
-        const currentPageSpan = document.getElementById('current-page');
-        const totalPagesSpan = document.getElementById('total-pages');
-        
-        // Set initial values
-        let totalPages = totalPagesFromServer || 1;
-        
-        // Update pagination display
-        totalPagesSpan.textContent = totalPages;
-        
-        // Only show pagination if we have more than 1 page
-        if (totalPages <= 1) {
-            document.querySelector('.pagination-controls').style.display = 'none';
-        } else {
-            document.querySelector('.pagination-controls').style.display = 'flex';
-        }
-        
-        // Update pagination UI
-        function updatePagination() {
-            currentPageSpan.textContent = currentPage;
-            prevButton.disabled = currentPage <= 1;
-            nextButton.disabled = currentPage >= totalPages;
+            // Pagination controls for visual comparison
+            const totalPages = 12;
+            let currentPage = 1;
             
-            // Update the displayed page content
-            updateDisplayedContent(currentPage);
-        }
-        
-        // Function to update the displayed content based on page number
-        function updateDisplayedContent(pageNum) {
-            // Visual comparison - load new images
-            fetch(`/get_page/${pageNum}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Update the images with new content
-                        document.getElementById('img1').src = data.img1_url;
-                        document.getElementById('img2').src = data.img2_url;
-                        
-                        // Update UI based on page availability
-                        if (!data.has_page1) {
-                            // Modify the card header to indicate this page doesn't exist in PDF A
-                            document.querySelector('.card-header.bg-danger').innerHTML = 
-                                '<i class="bi bi-exclamation-triangle me-2"></i>' +
-                                '<h5 class="mb-0">PDF A - No page available (New page in PDF B)</h5>';
-                        } else {
-                            // Restore the original header
-                            document.querySelector('.card-header.bg-danger').innerHTML = 
-                                '<i class="bi bi-file-earmark-text me-2"></i>' +
-                                '<h5 class="mb-0">PDF A - Red Highlights (Deletions)</h5>';
-                        }
-                        
-                        if (!data.has_page2) {
-                            // Modify the card header to indicate this page doesn't exist in PDF B
-                            document.querySelector('.card-header.bg-success').innerHTML = 
-                                '<i class="bi bi-exclamation-triangle me-2"></i>' +
-                                '<h5 class="mb-0">PDF B - No page available (New page in PDF A)</h5>';
-                        } else {
-                            // Restore the original header
-                            document.querySelector('.card-header.bg-success').innerHTML = 
-                                '<i class="bi bi-file-earmark-text me-2"></i>' +
-                                '<h5 class="mb-0">PDF B - Green Highlights (Additions)</h5>';
-                        }
-                    }
-                })
-                .catch(error => console.error('Error loading page:', error));
-
-            // Text comparison - load new text content
-            fetch(`/get_text_page/${pageNum}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Update the text content divs
-                        document.getElementById('text-a-content').innerHTML = data.text_a;
-                        document.getElementById('text-b-content').innerHTML = data.text_b;
-                        
-                        // Update UI based on text page availability
-                        if (!data.has_page1) {
-                            // Modify the text card header to indicate this page doesn't exist in PDF A
-                            document.querySelectorAll('.card-header.bg-danger')[1].innerHTML = 
-                                '<i class="bi bi-exclamation-triangle me-2"></i>' +
-                                '<h5 class="mb-0">Text from PDF A - No page available</h5>';
-                        } else {
-                            // Restore the original text header
-                            document.querySelectorAll('.card-header.bg-danger')[1].innerHTML = 
-                                '<i class="bi bi-file-text me-2"></i>' +
-                                '<h5 class="mb-0">Text from PDF A</h5>';
-                        }
-                        
-                        if (!data.has_page2) {
-                            // Modify the text card header to indicate this page doesn't exist in PDF B
-                            document.querySelectorAll('.card-header.bg-success')[1].innerHTML = 
-                                '<i class="bi bi-exclamation-triangle me-2"></i>' +
-                                '<h5 class="mb-0">Text from PDF B - No page available</h5>';
-                        } else {
-                            // Restore the original text header
-                            document.querySelectorAll('.card-header.bg-success')[1].innerHTML = 
-                                '<i class="bi bi-file-text me-2"></i>' +
-                                '<h5 class="mb-0">Text from PDF B</h5>';
-                        }
-                    }
-                })
-                .catch(error => console.error('Error loading text page:', error));
-        }
-        
-        // Event listeners for pagination buttons
-        prevButton.addEventListener('click', function() {
-            if (currentPage > 1) {
-                currentPage--;
-                updatePagination();
+            const prevPageBtn = document.getElementById('prev-page');
+            const nextPageBtn = document.getElementById('next-page');
+            const currentPageSpan = document.getElementById('current-page');
+            const totalPagesSpan = document.getElementById('total-pages');
+            
+            totalPagesSpan.textContent = totalPages;
+            
+            // Update page navigation buttons
+            function updatePageButtons() {
+                prevPageBtn.disabled = currentPage === 1;
+                nextPageBtn.disabled = currentPage === totalPages;
+                currentPageSpan.textContent = currentPage;
             }
-        });
-        
-        nextButton.addEventListener('click', function() {
-            if (currentPage < totalPages) {
-                currentPage++;
-                updatePagination();
+            
+            // Navigate to previous page
+            prevPageBtn.addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    updatePageButtons();
+                    updatePageImages();
+                }
+            });
+            
+            // Navigate to next page
+            nextPageBtn.addEventListener('click', function() {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updatePageButtons();
+                    updatePageImages();
+                }
+            });
+            
+            // Update page images (in a real app, these would be loaded from the server)
+            function updatePageImages() {
+                const docAImage = document.querySelector('#visual-content .pdf-image:first-child');
+                const docBImage = document.querySelector('#visual-content .pdf-image:last-child');
+                
+                docAImage.src = `https://via.placeholder.com/800x1100/f8f9fa/333333?text=Document+A+-+Page+${currentPage}+(Placeholder)`;
+                docBImage.src = `https://via.placeholder.com/800x1100/f8f9fa/333333?text=Document+B+-+Page+${currentPage}+(Placeholder)`;
             }
+            
+            // Text comparison pagination (similar to visual pagination)
+            const totalTextPages = 12;
+            let currentTextPage = 1;
+            
+            const prevTextPageBtn = document.getElementById('prev-text-page');
+            const nextTextPageBtn = document.getElementById('next-text-page');
+            const currentTextPageSpan = document.getElementById('current-text-page');
+            const totalTextPagesSpan = document.getElementById('total-text-pages');
+            
+            totalTextPagesSpan.textContent = totalTextPages;
+            
+            function updateTextPageButtons() {
+                prevTextPageBtn.disabled = currentTextPage === 1;
+                nextTextPageBtn.disabled = currentTextPage === totalTextPages;
+                currentTextPageSpan.textContent = currentTextPage;
+            }
+            
+            prevTextPageBtn.addEventListener('click', function() {
+                if (currentTextPage > 1) {
+                    currentTextPage--;
+                    updateTextPageButtons();
+                }
+            });
+            
+            nextTextPageBtn.addEventListener('click', function() {
+                if (currentTextPage < totalTextPages) {
+                    currentTextPage++;
+                    updateTextPageButtons();
+                }
+            });
         });
-        
-        // Initialize
-        updatePagination();
-    }
-</script>
-
-<style>
-    /* Dark mode fixes */
-    .bg-light {
-        background-color: var(--bs-light) !important;
-    }
-    
-    .text-muted {
-        color: var(--bs-gray-600) !important;
-    }
-    
-    .card {
-        background-color: var(--bs-body-bg);
-    }
-    
-    .card-header {
-        background-color: var(--bs-body-bg) !important;
-    }
-    
-    /* Compact spacing */
-    .card-body {
-        padding: 0.5rem;
-    }
-    
-    .mb-5, .mb-4 {
-        margin-bottom: 1rem !important;
-    }
-    
-    .py-5 {
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
-    }
-    
-    /* Ensure pagination controls are always visible */
-    .pagination-controls {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 1rem;
-        margin: 1rem 0;
-    }
-    
-    /* Update danger/success colors to match our brand guidelines */
-    .bg-danger.bg-opacity-10 {
-        background-color: rgba(239, 68, 68, 0.15) !important;
-    }
-    
-    .text-danger {
-        color: #b91c1c !important;
-    }
-    
-    .bg-success.bg-opacity-10 {
-        background-color: rgba(79, 127, 17, 0.15) !important;
-    }
-    
-    .text-success {
-        color: #4F7F11 !important;
-    }
-    
-    /* Image grid styling */
-    .image-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 10px;
-        margin-top: 10px;
-    }
-    
-    .image-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .image-caption {
-        font-size: 0.8rem;
-        text-align: center;
-        margin-top: 4px;
-    }
-    
-    .img-thumbnail {
-        max-height: 120px;
-        object-fit: contain;
-    }
-</style>
-{% endblock %}
+    </script>
+</body>
+</html>

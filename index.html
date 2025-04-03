@@ -1,388 +1,238 @@
-{% extends 'base.html' %}
-{% block title %}PDFusion - Compare PDF Files{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDFusion - Compare PDF Files</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="static/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="static/images/favicon.png">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" href="/">
+                    <span class="logo-icon-container">
+                        <img src="static/images/logo.png" alt="PDFusion Logo" class="img-fluid logo-img">
+                    </span>
+                    PDFusion
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#how-it-works">How It Works</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#pricing">Pricing</a>
+                        </li>
+                        <li class="nav-item">
+                            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="sun-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="moon-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                            </button>
+                        </li>
+                    </ul>
+                    <a href="#sponsor" class="d-flex align-items-center">
+                        <img src="static/images/Sponsor_1.png" alt="Sponsor" class="img-fluid sponsor-image-nav" style="max-height: 40px;">
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
 
-{% block content %}
-<section class="py-4">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h1 class="fw-bold hero-title">PDFusion</h1>
-            <p class="lead">Use AI to Compare PDF Files</p>
-        </div>
+    <main>
+        <div class="container">
+            <div class="hero-section">
+                <h1>PDFusion</h1>
+                <h2>Use AI to Compare PDF Files</h2>
+            </div>
 
-        <div class="row justify-content-center" id="get-started">
-            <div class="col-md-8">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary py-3">
-                        <h4 class="mb-0 text-white">Upload Files for Comparison</h4>
-                    </div>
-                    <div class="card-body p-4">
-                        <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
-                            <div class="mb-4">
-                                <label class="form-label fw-bold" for="pdf1">PDF Document 1</label>
+            <div class="upload-section">
+                <h4>Upload Files for Comparison</h4>
+                <form action="https://yourflaskappurl.com/upload" method="post" enctype="multipart/form-data" class="upload-form">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="upload-box">
+                                <label for="pdf1" class="form-label">PDF Document 1</label>
+                                <p class="text-muted">The original document to compare against.</p>
                                 <input type="file" class="form-control" id="pdf1" name="pdf1" accept=".pdf" required>
-                                <div class="form-text text-muted fw-normal">The original document to compare against.</div>
                             </div>
-                            
-                            <div class="mb-4">
-                                <label class="form-label fw-bold" for="pdf2">PDF Document 2</label>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="upload-box">
+                                <label for="pdf2" class="form-label">PDF Document 2</label>
+                                <p class="text-muted">The modified document to compare with the original.</p>
                                 <input type="file" class="form-control" id="pdf2" name="pdf2" accept=".pdf" required>
-                                <div class="form-text text-muted fw-normal">The modified document to compare with the original.</div>
                             </div>
-                            
-                            <div class="text-center mt-4">
-                                <button type="submit" class="btn btn-primary btn-lg px-4">
-                                    <i class="bi bi-search me-2"></i>Compare Files
-                                </button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">Compare Files</button>
+                    </div>
+                </form>
             </div>
-        </div>
-        
-        <!-- Unified How It Works & Features Section -->
-        <div class="row mt-5 pt-5" id="how-it-works">
-            <div class="col-12">
-                <div class="text-center mb-5">
-                    <h2 class="fw-bold">How It Works</h2>
-                    <p class="text-muted mx-auto" style="max-width: 700px;">Our powerful features guide you through an effortless document comparison experience</p>
-                </div>
+
+            <div class="how-it-works-section" id="how-it-works">
+                <h2>How It Works</h2>
+                <p class="section-description">Our powerful features guide you through an effortless document comparison experience</p>
                 
-                <!-- Feature steps with numbers and icons -->
-                <div class="workflow-container">
-                    <div class="workflow-steps">
-                        <div class="workflow-step user-step">
-                            <div class="step-icon">
-                                <div class="icon-content">📤</div>
-                            </div>
-                            <div class="step-number">1</div>
-                            <div class="step-content">
-                                <h5>Upload</h5>
-                                <p>Upload your documents</p>
-                            </div>
+                <div class="row mt-5">
+                    <div class="col-md-4 mb-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">📤</div>
+                            <div class="feature-step">1</div>
+                            <h5>Upload</h5>
+                            <p>Upload your documents</p>
                         </div>
-                        <div class="workflow-step backend-step">
-                            <div class="step-icon">
-                                <div class="icon-content">🖼️</div>
-                            </div>
-                            <div class="step-number">2</div>
-                            <div class="step-content">
-                                <h5>Extract Images</h5>
-                                <p>Images are extracted</p>
-                            </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">🖼️</div>
+                            <div class="feature-step">2</div>
+                            <h5>Extract Images</h5>
+                            <p>Images are extracted</p>
                         </div>
-                        <div class="workflow-step backend-step">
-                            <div class="step-icon">
-                                <div class="icon-content">📝</div>
-                            </div>
-                            <div class="step-number">3</div>
-                            <div class="step-content">
-                                <h5>Extract Text</h5>
-                                <p>Text is processed</p>
-                            </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">📝</div>
+                            <div class="feature-step">3</div>
+                            <h5>Extract Text</h5>
+                            <p>Text is processed</p>
                         </div>
-                        <div class="workflow-step backend-step">
-                            <div class="step-icon">
-                                <div class="icon-content">🤖</div>
-                            </div>
-                            <div class="step-number">4</div>
-                            <div class="step-content">
-                                <h5>AI Analysis</h5>
-                                <p>AI analyzes differences</p>
-                            </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">🤖</div>
+                            <div class="feature-step">4</div>
+                            <h5>AI Analysis</h5>
+                            <p>AI analyzes differences</p>
                         </div>
-                        <div class="workflow-step user-step">
-                            <div class="step-icon">
-                                <div class="icon-content">🔍</div>
-                            </div>
-                            <div class="step-number">5</div>
-                            <div class="step-content">
-                                <h5>Visual Results</h5>
-                                <p>See highlighted changes</p>
-                            </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">🔍</div>
+                            <div class="feature-step">5</div>
+                            <h5>Visual Results</h5>
+                            <p>See highlighted changes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pricing-section" id="pricing">
+                <h2>Pricing Plans</h2>
+                <p class="section-description">Choose the plan that fits your needs</p>
+                
+                <div class="row justify-content-center mt-5">
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="pricing-card">
+                            <h5>Free</h5>
+                            <div class="price">$0 CAD</div>
+                            <ul class="features-list">
+                                <li><span class="check">✅</span> 5 comparisons</li>
+                                <li><span class="check">✅</span> 5 AI-powered insights</li>
+                                <li><span class="cross">❌</span> Priority support</li>
+                            </ul>
+                            <a href="#" class="btn btn-outline-primary">Start Free</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="pricing-card popular">
+                            <div class="popular-badge">POPULAR CHOICE</div>
+                            <h5>Pro</h5>
+                            <div class="price">$10 CAD/month</div>
+                            <ul class="features-list">
+                                <li><span class="check">✅</span> 50 comparisons</li>
+                                <li><span class="check">✅</span> 50 AI-powered insights</li>
+                                <li><span class="check">✅</span> Priority support</li>
+                            </ul>
+                            <a href="#" class="btn btn-primary">Go Pro</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="pricing-card">
+                            <h5>Enterprise</h5>
+                            <div class="price">$29 CAD/month</div>
+                            <ul class="features-list">
+                                <li><span class="check">✅</span> Unlimited comparisons</li>
+                                <li><span class="check">✅</span> Unlimited AI-powered insights</li>
+                                <li><span class="check">✅</span> Priority support</li>
+                            </ul>
+                            <a href="#" class="btn btn-outline-primary">Contact Us</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </main>
 
-        <!-- Pricing Section -->
-        <div class="row mt-5 pt-5" id="pricing">
-            <div class="col-12">
-                <div class="text-center mb-5">
-                    <h2 class="fw-bold">Pricing Plans</h2>
-                    <p class="text-muted mx-auto" style="max-width: 600px;">Choose the plan that fits your needs</p>
+    <footer>
+        <div class="container">
+            <div class="row align-items-center justify-content-between">
+                <div class="col-md-4 mb-4 mb-md-0 text-center text-md-start">
+                    <a class="navbar-brand" href="/">
+                        <span class="logo-icon-container">
+                            <img src="static/images/logo.png" alt="PDFusion Logo" class="img-fluid logo-img">
+                        </span>
+                        PDFusion
+                    </a>
+                    <p class="mt-3 text-muted">Intelligent PDF comparison with AI-powered insights.</p>
                 </div>
-                <div class="row g-4 justify-content-center">
-                    <div class="col-md-4">
-                        <div class="card h-100">
-                            <div class="card-body p-4">
-                                <h5 class="card-title text-center mb-3">Free</h5>
-                                <div class="text-center mb-4">
-                                    <span class="display-5 fw-bold">$0</span>
-                                    <span class="text-muted">CAD</span>
-                                </div>
-                                <ul class="list-unstyled mb-4">
-                                    <li class="mb-2">✅ 5 comparisons</li>
-                                    <li class="mb-2">✅ 5 AI-powered insights</li>
-                                    <li class="mb-2 text-muted">❌ Priority support</li>
-                                </ul>
-                                <div class="text-center mt-auto">
-                                    <a href="#" class="btn btn-outline-primary w-100">Start Free</a>
-                                </div>
-                            </div>
-                        </div>
+                <div class="col-md-4">
+                    <div class="footer-links">
+                        <a href="#how-it-works">How It Works</a>
+                        <a href="#pricing">Pricing</a>
+                        <a href="#contact">Contact</a>
+                        <a href="#privacy">Privacy</a>
+                        <a href="#terms">Terms</a>
                     </div>
-                    <div class="col-md-4">
-                        <div class="card h-100 border-primary">
-                            <!-- Popular badge at the top of the card -->
-                            <div class="card-popular-top">POPULAR CHOICE</div>
-                            <div class="card-body pt-3 px-4 pb-4">
-                                <h5 class="card-title text-center mb-3">Pro</h5>
-                                <div class="text-center mb-4">
-                                    <span class="display-5 fw-bold">$10</span>
-                                    <span class="text-muted">CAD/month</span>
-                                </div>
-                                <ul class="list-unstyled mb-4">
-                                    <li class="mb-2">✅ 50 comparisons</li>
-                                    <li class="mb-2">✅ 50 AI-powered insights</li>
-                                    <li class="mb-2">✅ Priority support</li>
-                                </ul>
-                                <div class="text-center mt-auto">
-                                    <a href="#" class="btn btn-primary w-100">Go Pro</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card h-100">
-                            <div class="card-body p-4">
-                                <h5 class="card-title text-center mb-3">Enterprise</h5>
-                                <div class="text-center mb-4">
-                                    <span class="display-5 fw-bold">$29</span>
-                                    <span class="text-muted">CAD/month</span>
-                                </div>
-                                <ul class="list-unstyled mb-4">
-                                    <li class="mb-2">✅ Unlimited comparisons</li>
-                                    <li class="mb-2">✅ Unlimited AI-powered insights</li>
-                                    <li class="mb-2">✅ Priority support</li>
-                                </ul>
-                                <div class="text-center mt-auto">
-                                    <a href="#" class="btn btn-outline-primary w-100">Contact Us</a>
-                                </div>
-                            </div>
-                        </div>
+                    <p class="mt-4 text-center text-muted">&copy; 2025 PDFusion - All rights reserved</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="sponsor-section text-center d-flex flex-column justify-content-center h-100">
+                        <a href="#sponsor" class="d-block">
+                            <img src="static/images/Sponsor_1_1.png" alt="Sponsor" class="img-fluid sponsor-image border-0" style="max-height: 80px;">
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        
+        // Check for saved theme preference or use preferred color scheme
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        // Toggle theme
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
 
-<style>
-    .hero-title {
-        font-family: 'Montserrat', sans-serif;
-        font-weight: 600;
-        font-size: 3.5rem;
-        color: var(--primary);
-        margin-bottom: 1rem;
-    }
-    
-    /* Form help text styles - explicitly dark in light mode, white in dark mode */
-    .form-help-text {
-        color: #000000 !important;
-        font-weight: 600;
-    }
-    
-    @media (prefers-color-scheme: dark) {
-        .form-help-text {
-            color: #ffffff !important;
-        }
-    }
-    
-    /* Modern workflow style */
-    .workflow-container {
-        margin: 2rem 0 3rem;
-        overflow-x: auto; /* Allow horizontal scroll on small screens */
-    }
-    
-    .workflow-steps {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        min-width: 100%;
-        padding: 0.5rem;
-    }
-    
-    .workflow-step {
-        flex: 1;
-        min-width: 120px;
-        position: relative;
-        padding: 1rem;
-        text-align: center;
-        transition: all 0.3s ease;
-        background-color: rgba(255, 255, 255, 0.05);
-        border-radius: 15px;
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        overflow: hidden;
-        z-index: 1;
-        margin: 0 5px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-    }
-    
-    /* Remove margin between steps */
-    .workflow-step:not(:last-child) {
-        margin-right: 0;
-    }
-    
-    /* Step icons */
-    .step-icon {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        margin: 0 auto 1rem;
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-        z-index: 2;
-    }
-    
-    .icon-content {
-        position: relative;
-        z-index: 2;
-        font-size: 2rem;
-    }
-    
-    .user-step .step-icon {
-        background-color: rgba(3, 78, 145, 0.1);
-        border-color: var(--primary);
-    }
-    
-    .backend-step .step-icon {
-        background-color: rgba(128, 128, 128, 0.08);
-        border-color: var(--secondary);
-    }
-    
-    /* Step numbers */
-    .step-number {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background-color: var(--primary);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 0.9rem;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        z-index: 3;
-    }
-    
-    .backend-step .step-number {
-        background-color: var(--secondary);
-    }
-    
-    /* Step content */
-    .step-content {
-        padding: 0.5rem 0;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .step-content h5 {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 0.3rem;
-    }
-    
-    .step-content p {
-        font-size: 0.9rem;
-        color: var(--text-muted, #6c757d);
-        margin-bottom: 0;
-    }
-    
-    /* Hover effects */
-    .workflow-step:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    }
-    
-    .user-step:hover {
-        background-color: rgba(13, 110, 253, 0.15);
-        border-color: var(--primary);
-    }
-    
-    .backend-step:hover {
-        background-color: rgba(40, 167, 69, 0.15);
-        border-color: var(--success, #28a745);
-    }
-    
-    .workflow-step:hover .step-icon {
-        transform: scale(1.05);
-    }
-    
-    :root {
-        --text-color: #212529;
-        --text-muted: #6c757d;
-    }
-    
-    @media (prefers-color-scheme: dark) {
-        .form-help-text {
-            color: #ffffff !important;
-        }
-        
-        :root {
-            --text-color: #f8f9fa;
-            --text-muted: #adb5bd;
-        }
-        
-        .user-step {
-            background-color: rgba(13, 110, 253, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        .backend-step {
-            background-color: rgba(173, 181, 189, 0.05);
-            border-color: rgba(255, 255, 255, 0.05);
-        }
-        
-        .user-step .step-icon {
-            background-color: rgba(13, 110, 253, 0.15);
-        }
-        
-        .backend-step .step-icon {
-            background-color: rgba(173, 181, 189, 0.1);
-        }
-        
-        .user-step:hover {
-            background-color: rgba(13, 110, 253, 0.1);
-            border-color: rgba(13, 110, 253, 0.3);
-        }
-        
-        .backend-step:hover {
-            background-color: rgba(173, 181, 189, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-    }
-    
-    /* Ensure responsive behavior */
-    @media (max-width: 768px) {
-        .workflow-steps {
-            justify-content: flex-start;
-            min-width: 700px; /* Ensure steps don't squish too much */
-        }
-        
-        .workflow-container {
-            padding-bottom: 1rem;
-        }
-    }
-</style>
-
-{% endblock %}
+        // For GitHub Pages demo, disable form submission and show an alert
+        document.querySelector('.upload-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('This is a static demo of PDFusion. For full functionality, please run the Flask application locally.');
+        });
+    </script>
+</body>
+</html>

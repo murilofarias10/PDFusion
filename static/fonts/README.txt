@@ -1,14 +1,14 @@
-# Designer Regular Font
+# Fonts Directory
 
-This directory should contain the Designer Regular font files:
-
-- Designer-Regular.woff2
+This directory should contain the following font files:
 - Designer-Regular.woff
+- Designer-Regular.woff2
 
-## Instructions:
+These fonts are used in the styles.css file. 
 
-1. Purchase or download the Designer Regular font from a legitimate source
-2. Convert it to web formats (WOFF2 and WOFF) using a tool like FontSquirrel's Webfont Generator
-3. Place the converted files in this directory
+If you don't have these specific fonts, you can:
+1. Add them to this directory if you have the files
+2. Modify the CSS to use different fonts
+3. The site will still work with system fallback fonts
 
-Note: Until the actual font files are added, the system will fall back to system fonts as defined in the CSS. 
+For the GitHub Pages demo, the site will use system fonts if these files are not present. 
